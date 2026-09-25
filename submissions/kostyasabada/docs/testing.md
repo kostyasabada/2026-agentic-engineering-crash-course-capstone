@@ -2,6 +2,8 @@
 
 Application verification commands are not available yet because implementation has not started. The planned scenarios will be automated as `@playwright/test` browser end-to-end tests (see `architecture.md`); add exact commands alongside the tests.
 
+`npm run check` is the planned single check command (lint, type check, unit tests, and E2E) used by the agent loop in `architecture.md`; define it with the tests.
+
 Agent-driven browser checks and screenshots (for example, the Codex `playwright` skill or the Claude Code browser) are supplementary manual checks, not a substitute for the automated tests.
 
 ## Planned scenarios

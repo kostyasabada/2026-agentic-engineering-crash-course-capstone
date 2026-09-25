@@ -48,4 +48,6 @@ npx --yes @fission-ai/openspec@1.13.2 validate --all --strict
 
 This process description is not evidence of an executed automated loop. Claiming loop engineering requires a reproducible mechanism and a record of an actual run.
 
+An agent loop script and a Claude Code `SessionStart` context hook are planned for the first OpenSpec change (see `architecture.md`); neither exists yet.
+
 Documentation: https://github.com/Fission-AI/OpenSpec.

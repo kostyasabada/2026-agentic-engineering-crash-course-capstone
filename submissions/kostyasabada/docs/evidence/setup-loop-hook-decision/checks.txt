@@ -1,0 +1,45 @@
+# setup-loop-hook-decision checks (run from submissions/kostyasabada/, 2026-09-25T15:33:47Z)
+
+$ git diff --check
+exit: 0
+
+$ python3 YAML parse of openspec/config.yaml (rules.design, rules.tasks)
+design:
+  - str | Distinguish accepted decisions, proposals, and open questions.
+  - str | Specify browser E2E tests with @playwright/test (dev dependency), including configuration, test location, dev server startup, and the exact run command.
+  - str | Specify scripts/agent-loop.sh (interface and arguments, claude -p or codex exec agent selection, iteration limit defaulting to 5, stop conditions, and the loop-run.log format) and the Claude Code SessionStart hook in .claude/settings.json running the pinned OpenSpec list --json command (configuration, output, failure behavior, and Codex parity or its documented limitation).
+tasks:
+  - str | Include appropriate checks and recording of actual results.
+  - str | Keep the main agent as coordinator only; require a fresh maker subagent per task and a separate checker, with scoped context and no full history by default. Follow docs/review-process.md for handoffs, fixes, evidence, and completion criteria.
+  - str | Include a task that runs a real task through scripts/agent-loop.sh and commits its docs/evidence/<task-id>/loop-run.log, and a task that records the actual output of the SessionStart hook as evidence. A loop result still requires separate checker acceptance.
+exit: 0
+
+$ ls -d scripts .claude/settings.json package.json
+ls: cannot access 'scripts': No such file or directory
+ls: cannot access '.claude/settings.json': No such file or directory
+ls: cannot access 'package.json': No such file or directory
+exit: 2 (non-zero expected: all absent)
+
+$ npx --yes @fission-ai/openspec@1.13.2 validate --all --strict
+- Validating...
+No items found to validate.
+exit: 0
+
+$ git status --short
+ M docs/architecture.md
+ M docs/evidence/README.md
+ M docs/testing.md
+ M docs/workflow.md
+ M openspec/config.yaml
+?? docs/evidence/setup-loop-hook-decision/
+exit: 0
+
+$ git status --short --untracked-files=all
+ M docs/architecture.md
+ M docs/evidence/README.md
+ M docs/testing.md
+ M docs/workflow.md
+ M openspec/config.yaml
+?? docs/evidence/setup-loop-hook-decision/checks.txt
+?? docs/evidence/setup-loop-hook-decision/implementation.md
+exit: 0
