@@ -17,6 +17,7 @@ rules:
     - Distinguish accepted decisions, proposals, and open questions.
     - Specify browser E2E tests with @playwright/test (dev dependency), including configuration, test location, dev server startup, and the exact run command.
     - Specify scripts/agent-loop.sh (interface and arguments, claude -p or codex exec agent selection, iteration limit defaulting to 5, stop conditions, and the loop-run.log format) and the Claude Code SessionStart hook in .claude/settings.json running the pinned OpenSpec list --json command (configuration, output, failure behavior, and Codex parity or its documented limitation).
+    - Specify agent loop ownership and limits (the task maker launches scripts/agent-loop.sh, not the coordinator; default fixer codex exec with claude -p selectable; default checker a separate Claude Code subagent that reviews loop-run.log and reruns checks), permissions for launching agent CLIs from the script, and cost control through the iteration limit.
   tasks:
     - Include appropriate checks and recording of actual results.
     - Keep the main agent as coordinator only; require a fresh maker subagent per task and a separate checker, with scoped context and no full history by default. Follow docs/review-process.md for handoffs, fixes, evidence, and completion criteria.

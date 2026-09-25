@@ -5,6 +5,7 @@
 - Coordinator: the main agent tracks scope, delegates tasks, receives results, and reports completion. It may orchestrate tools, Git, and integration, but does not implement task deliverables or silently edit them after accepted review.
 - Maker: a fresh, separate subagent for each task implements its deliverables, runs appropriate checks, and records evidence. Return fixes to that task's maker; use a fresh maker for unrelated tasks.
 - Checker: a separate subagent, distinct from the coordinator and maker, reviews requirements, changed files, and evidence, and independently runs appropriate checks. A second pass by the maker does not qualify.
+- Agent loop: fix iterations run by the loop (see `architecture.md`) are part of the maker's work. A green loop is not checker acceptance; the checker also reviews the task's `loop-run.log`.
 
 This applies to implementation, documentation, configuration, and specification tasks. Use checks appropriate to the change; documentation edits do not require application tests.
 

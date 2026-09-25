@@ -1,0 +1,26 @@
+# setup-loop-ownership checks (run from submissions/kostyasabada/, base commit 6b636c3)
+
+$ git diff --check
+exit: 0
+
+$ python3 -c (PyYAML parse of openspec/config.yaml, list rules.design)
+rules.design: 4 items, all strings: True
+1. Distinguish accepted decisions, proposals, and open questions.
+2. Specify browser E2E tests with @playwright/test (dev dependency), including configuration, test location, dev server startup, and the exact run command.
+3. Specify scripts/agent-loop.sh (interface and arguments, claude -p or codex exec agent selection, iteration limit defaulting to 5, stop conditions, and the loop-run.log format) and the Claude Code SessionStart hook in .claude/settings.json running the pinned OpenSpec list --json command (configuration, output, failure behavior, and Codex parity or its documented limitation).
+4. Specify agent loop ownership and limits (the task maker launches scripts/agent-loop.sh, not the coordinator; default fixer codex exec with claude -p selectable; default checker a separate Claude Code subagent that reviews loop-run.log and reruns checks), permissions for launching agent CLIs from the script, and cost control through the iteration limit.
+exit: 0
+
+$ npx --yes @fission-ai/openspec@1.13.2 validate --all --strict
+- Validating...
+No items found to validate.
+exit: 0
+
+$ git status --short --untracked-files=all
+ M docs/architecture.md
+ M docs/evidence/README.md
+ M docs/review-process.md
+ M openspec/config.yaml
+?? docs/evidence/setup-loop-ownership/checks.txt
+?? docs/evidence/setup-loop-ownership/implementation.md
+exit: 0

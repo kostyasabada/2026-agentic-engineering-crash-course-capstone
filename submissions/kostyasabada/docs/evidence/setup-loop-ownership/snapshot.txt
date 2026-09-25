@@ -1,0 +1,7 @@
+62f219b323b70260737c8f1c93f05dee43e779a9c0cb6414372d7076ef5c9e85  submissions/kostyasabada/docs/architecture.md
+a01a587f5c14e625fa5d8c8b44c065d890d5a4d665d7c85b195575181652a536  submissions/kostyasabada/docs/review-process.md
+f1f6598da0f2137137c136429b393d600c5676937939fbf6728f43750708a1b0  submissions/kostyasabada/openspec/config.yaml
+cc5fc57c0ad76fe97c3c1c175896d3b1ec9d74a973420b7765514907960ad2d8  submissions/kostyasabada/docs/evidence/README.md
+34c33bb82a17b5a82881dba8252bc0d8678095bf74a24d7c4e53332cf75b9d80  submissions/kostyasabada/docs/evidence/setup-loop-ownership/implementation.md
+5abc3226ffc3ba985f98cee1ce9160466d161ef269343971912fae497fd390d8  submissions/kostyasabada/docs/evidence/setup-loop-ownership/checks.txt
+# Base commit: 6b636c3b66620dc99cd4a17eb063a5030dbc8696. snapshot.txt itself and review.md are not hashed.
