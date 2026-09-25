@@ -1,0 +1,12 @@
+$ sha256sum -c submissions/kostyasabada/docs/evidence/setup-review-process/snapshot.txt
+submissions/kostyasabada/AGENTS.md: OK
+submissions/kostyasabada/docs/review-process.md: OK
+submissions/kostyasabada/docs/workflow.md: OK
+submissions/kostyasabada/docs/evidence/README.md: OK
+submissions/kostyasabada/openspec/config.yaml: OK
+Exit code: 0
+
+$ git diff --check
+Exit code: 0
+
+Content checks: all five deliverables contain no Cyrillic text or trailing whitespace. PASS.

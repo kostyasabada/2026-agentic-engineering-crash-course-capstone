@@ -1,0 +1,20 @@
+schema: spec-driven
+
+context: |
+  Educational capstone: a chat between people.
+  Application framework: Next.js (user decision). Define the remaining stack in the design.
+  Write all project artifacts in English; preserve required OpenSpec format markers.
+  Project boundary: submissions/kostyasabada/. Do not modify course files.
+  Read details as needed using the context map in AGENTS.md.
+  Keep requirements in OpenSpec without duplicating them in other documents.
+
+rules:
+  proposal:
+    - State the goal, scope, and non-goals of the change.
+  specs:
+    - Add verifiable scenarios for requirements, including failure cases.
+  design:
+    - Distinguish accepted decisions, proposals, and open questions.
+  tasks:
+    - Include appropriate checks and recording of actual results.
+    - Require a maker and a different checker agent for each task; follow docs/review-process.md for evidence and completion criteria.
