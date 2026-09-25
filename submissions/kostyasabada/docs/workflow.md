@@ -10,6 +10,17 @@ Start a Codex task with `submissions/kostyasabada/` as its working directory to 
 
 Generated instructions remain upstream files. Their task-writing and implementation steps are performed by a fresh maker, while the main agent coordinates. Apply's immediate completion/checkmark examples only apply after the separate checker accepts the final snapshot, as required by `AGENTS.md` and `docs/review-process.md`. Prepare and commit specifications before implementation even when a generated skill permits interleaving. During archive, delegate spec synchronization synchronously, wait for the maker and independent checker, and only then move the change. A CLI `all_done` state alone is not review evidence. Recheck these rules after regenerating the integration.
 
+## Claude Code
+
+The project is also used with Claude Code (user decision). `CLAUDE.md` imports `AGENTS.md` with `@AGENTS.md`, so both tools follow the same rules; it only adds a short tool mapping.
+
+- Launch Claude Code with `submissions/kostyasabada/` as the working directory.
+- The six OpenSpec skills are exposed at `.claude/skills/<skill-name>` as relative symlinks to `../../.agents/skills/<skill-name>`. `.agents/skills/` remains the single source, so regenerating the Codex integration updates both tools. Invoke them as `/openspec-propose`, `/openspec-apply-change`, and so on.
+- Re-initializing OpenSpec with `--tools claude` would generate separate duplicate copies under `.claude/`; prefer the symlinks. If the Codex integration is regenerated, check that the symlinks still resolve.
+- Apply the same `openspec` executable substitution (see Commands) and the same coordinator, maker, and checker rules. Spawn makers and checkers as fresh Agent-tool subagents with self-contained handoffs, not context-inheriting forks.
+- The personal Codex skills in `~/.codex/skills/` are not exposed to Claude Code.
+- Symlink resolution was verified on the filesystem; runtime skill discovery and invocation in a new Claude Code session have not been verified.
+
 ## Commands
 
 Run from `submissions/kostyasabada/`. The version is pinned in the commands; no global installation is needed. The first run requires access to npm.

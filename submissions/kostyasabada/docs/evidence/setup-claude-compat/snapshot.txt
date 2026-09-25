@@ -1,0 +1,15 @@
+b1bcdc343dc5bb21e0a0181ef47624a0f6c49574c68745f5c68256e5b94d165d  submissions/kostyasabada/CLAUDE.md
+0efc1e1428ccdc366e358c2f5137bafb99be6ad08e614b774ef9f9664bb538f3  submissions/kostyasabada/AGENTS.md
+061689ce69aa19bbf5378139fe127ef95a2ee8d2141bc621d95364f2d4fdd1e6  submissions/kostyasabada/docs/review-process.md
+6a0ce09cd7a2e8b366c603bff2b3cbe3bf39aa65c822f7680b9c86425b18ff8b  submissions/kostyasabada/docs/workflow.md
+a9ce789c7724d9b942d58c57fe23e518f4b7f0032fc8c13497e265d26ce575ea  submissions/kostyasabada/docs/evidence/README.md
+f2d9e52f31e572698e187403390bd65c7dc51803a95ebe3309c5238435200d76  submissions/kostyasabada/docs/evidence/setup-claude-compat/implementation.md
+d5b85f32ac172de2e4886583c52b1d94371f8c6abf3d27a8aa34d6440346a4be  submissions/kostyasabada/docs/evidence/setup-claude-compat/checks.txt
+# Symlinks (not hashed; path -> readlink target):
+symlink  submissions/kostyasabada/.claude/skills/openspec-apply-change -> ../../.agents/skills/openspec-apply-change
+symlink  submissions/kostyasabada/.claude/skills/openspec-archive-change -> ../../.agents/skills/openspec-archive-change
+symlink  submissions/kostyasabada/.claude/skills/openspec-explore -> ../../.agents/skills/openspec-explore
+symlink  submissions/kostyasabada/.claude/skills/openspec-propose -> ../../.agents/skills/openspec-propose
+symlink  submissions/kostyasabada/.claude/skills/openspec-sync-specs -> ../../.agents/skills/openspec-sync-specs
+symlink  submissions/kostyasabada/.claude/skills/openspec-update-change -> ../../.agents/skills/openspec-update-change
+# Base commit: 1d6d28efbd4efc7d1a1607714b18644ee400afd2. Unchanged upstream SKILL.md hashes: see docs/evidence/setup-project-skills/snapshot.txt.

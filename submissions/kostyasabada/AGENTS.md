@@ -8,7 +8,7 @@
 - Do not read all documentation, archived changes, or evidence logs by default. Do not duplicate requirements across documents.
 - Read the relevant `openspec/specs/` and active change in `openspec/changes/` for the current task.
 - Run appropriate checks before completion. Report actual results, failures, and anything not verified.
-- The main agent coordinates only: spawn a fresh maker subagent for each task and a separate checker, each with scoped context and no full history by default (`fork_turns="none"`). Follow `docs/review-process.md`; complete tasks only with evidence and checker acceptance of the final revision.
+- The main agent coordinates only: spawn a fresh maker subagent for each task and a separate checker, each with scoped context and no full history by default (Codex: `fork_turns="none"`; Claude Code: see `CLAUDE.md`). Follow `docs/review-process.md`; complete tasks only with evidence and checker acceptance of the final revision.
 - Never invent test results, reviews, iterations, or user decisions.
 - Installed skills follow these project ownership and completion rules. In generated OpenSpec instructions, implementation and artifact-writing steps belong to the maker; completion checkboxes and archive readiness require separate checker acceptance of the final snapshot. Read `docs/workflow.md` for invocation and integration details.
 
@@ -20,6 +20,7 @@
 | Existing capability requirements | `openspec/specs/<capability>/spec.md` |
 | Proposed change | `openspec/changes/<change>/` |
 | OpenSpec workflow | `docs/workflow.md` |
+| Claude Code mapping (imports this file) | `CLAUDE.md` |
 | Structure and technical decisions | `docs/architecture.md` |
 | Behavior verification | `docs/testing.md` |
 | Task ownership, independent review, and completion | `docs/review-process.md` |

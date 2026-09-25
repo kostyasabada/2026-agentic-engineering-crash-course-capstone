@@ -24,3 +24,10 @@ Source: the conversation during initial setup. Product checks have not taken pla
 - User decision: the main agent coordinates only, spawning a fresh separate maker for each task with its own scoped context, receiving the result, and using another separate checker.
 - Action: updated `../../AGENTS.md`, `../review-process.md`, `../workflow.md`, and `../../openspec/config.yaml` to define this process.
 - Source: the user's task delegation request in the setup conversation. Implementation and actual checks are recorded in `setup-agent-delegation/implementation.md` and `setup-agent-delegation/checks.txt`; acceptance requires a separate checker report.
+
+## Claude Code compatibility decision
+
+- Task: `setup-claude-compat`.
+- User decision: the project is worked on with both ChatGPT/Codex and Claude Code, and Claude Code must read and follow the same rules and instructions.
+- Action: added `../../CLAUDE.md` importing `../../AGENTS.md`, exposed the six OpenSpec skills at `../../.claude/skills/` as relative symlinks to `../../.agents/skills/`, and added tool-neutral qualifiers to `../../AGENTS.md`, `../review-process.md`, and `../workflow.md`.
+- Source: the user's Claude Code compatibility request in the setup conversation. Implementation and actual checks are recorded in `setup-claude-compat/implementation.md` and `setup-claude-compat/checks.txt`; acceptance requires a separate checker report.

@@ -10,7 +10,7 @@ This applies to implementation, documentation, configuration, and specification 
 
 ## Scoped handoffs
 
-Spawn makers and checkers with their own task context and no inherited full conversation history by default (`fork_turns="none"`). Provide the task ID, acceptance criteria, relevant specification/design paths, owned files, required checks, and constraints. Include the maker report and snapshot in the checker handoff. Agents may read dependencies as needed; do not preload unrelated documentation or evidence. Makers and checkers need not delegate recursively.
+Spawn makers and checkers with their own task context and no inherited full conversation history by default (Codex: `fork_turns="none"`; Claude Code: a fresh Agent-tool subagent, see `../CLAUDE.md`). Provide the task ID, acceptance criteria, relevant specification/design paths, owned files, required checks, and constraints. Include the maker report and snapshot in the checker handoff. Agents may read dependencies as needed; do not preload unrelated documentation or evidence. Makers and checkers need not delegate recursively.
 
 Each agent returns its changes or findings, actual checks and results, evidence paths, and open issues to the coordinator. The coordinator uses these results to arrange fixes and review before reporting completion.
 
