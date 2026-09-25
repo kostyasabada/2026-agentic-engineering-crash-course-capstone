@@ -19,8 +19,8 @@ npx --yes @fission-ai/openspec@1.13.2 validate --all --strict
 1. Create a separate change for an agreed task.
 2. Use `status` and `instructions` to obtain current artifact requirements for proposal, specs, design, and tasks. Do not invent the format.
 3. Prepare and commit the artifacts before implementation. Discuss unresolved product decisions with the user.
-4. Assign one maker to implement the task and record actual check results. Follow `docs/review-process.md` for evidence and review snapshots.
-5. Assign a different checker agent. Resolve findings and obtain acceptance of the final snapshot before marking the task complete.
+4. The main agent coordinates only and spawns a fresh maker subagent for each task with scoped context and no full history by default. The maker implements the task and records actual check results. Follow `docs/review-process.md` for handoffs, evidence, and review snapshots, including specification tasks.
+5. Spawn a separate checker with scoped context. Return findings to that task's maker and obtain checker acceptance of the final snapshot before marking the task complete.
 6. Archive the completed change following CLI guidance, merging requirements into `openspec/specs/`.
 
 `openspec/specs/` contains current requirements; `openspec/changes/` contains active changes; `openspec/changes/archive/` contains completed changes. The initial directories are intentionally empty: product specifications have not been written yet.

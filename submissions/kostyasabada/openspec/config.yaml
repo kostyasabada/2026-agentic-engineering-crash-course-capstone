@@ -17,4 +17,4 @@ rules:
     - Distinguish accepted decisions, proposals, and open questions.
   tasks:
     - Include appropriate checks and recording of actual results.
-    - Require a maker and a different checker agent for each task; follow docs/review-process.md for evidence and completion criteria.
+    - Keep the main agent as coordinator only; require a fresh maker subagent per task and a separate checker, with scoped context and no full history by default. Follow docs/review-process.md for handoffs, fixes, evidence, and completion criteria.

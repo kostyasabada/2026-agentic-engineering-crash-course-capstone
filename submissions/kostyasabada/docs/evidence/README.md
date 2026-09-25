@@ -17,3 +17,10 @@ Required task evidence and the completion gate are defined in `../review-process
 - Required a different agent to check every maker's task, with verifiable completion evidence.
 
 Source: the conversation during initial setup. Product checks have not taken place yet. Task review results, when available, are stored in the task directories below this directory.
+
+## Task delegation decision
+
+- Task: `setup-agent-delegation`.
+- User decision: the main agent coordinates only, spawning a fresh separate maker for each task with its own scoped context, receiving the result, and using another separate checker.
+- Action: updated `../../AGENTS.md`, `../review-process.md`, `../workflow.md`, and `../../openspec/config.yaml` to define this process.
+- Source: the user's task delegation request in the setup conversation. Implementation and actual checks are recorded in `setup-agent-delegation/implementation.md` and `setup-agent-delegation/checks.txt`; acceptance requires a separate checker report.

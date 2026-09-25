@@ -8,7 +8,7 @@
 - Do not read all documentation, archived changes, or evidence logs by default. Do not duplicate requirements across documents.
 - Read the relevant `openspec/specs/` and active change in `openspec/changes/` for the current task.
 - Run appropriate checks before completion. Report actual results, failures, and anything not verified.
-- Every task requires a maker and a different checker agent. Follow `docs/review-process.md`; do not mark a task complete without evidence and checker acceptance of the final revision.
+- The main agent coordinates only: spawn a fresh maker subagent for each task and a separate checker, each with scoped context and no full history by default (`fork_turns="none"`). Follow `docs/review-process.md`; complete tasks only with evidence and checker acceptance of the final revision.
 - Never invent test results, reviews, iterations, or user decisions.
 
 ## Context map — read as needed

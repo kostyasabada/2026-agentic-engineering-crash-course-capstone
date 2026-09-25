@@ -1,0 +1,10 @@
+$ git diff --check -- <five changed documentation deliverables>
+(no output)
+Exit code: 0
+Check: all five deliverables name coordinator, maker, and checker and end with a newline.
+Result: passed; exit code 0.
+Check: review process includes scoped handoff fields, dependency reading, same-maker fixes, returned open issues, and acceptance invalidation.
+Result: passed; exit code 0.
+Check: evidence README preserves its complete previous content as a prefix.
+Result: passed; exit code 0.
+Application tests and OpenSpec CLI validation were not run: this task changes process documentation and a task-rule string only.
