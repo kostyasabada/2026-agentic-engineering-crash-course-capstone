@@ -1,6 +1,8 @@
 # Verification
 
-Application verification commands are not available yet because implementation has not started. Add exact commands alongside the tests.
+Application verification commands are not available yet because implementation has not started. The planned scenarios will be automated as `@playwright/test` browser end-to-end tests (see `architecture.md`); add exact commands alongside the tests.
+
+Agent-driven browser checks and screenshots (for example, the Codex `playwright` skill or the Claude Code browser) are supplementary manual checks, not a substitute for the automated tests.
 
 ## Planned scenarios
 

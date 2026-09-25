@@ -1,0 +1,7 @@
+dacbb8874b876c40870063cf88d1eab991a91145cb2e0300ff020b5039f1325c  submissions/kostyasabada/docs/architecture.md
+38c6f86bc005c89d8844422227d35297bd31a82dfa09dc5b61d45b42c50d4f9f  submissions/kostyasabada/docs/testing.md
+bb3f1574ed852ecf2fef7ff480b7f276a2a0b424203309f1530ca39f82af9493  submissions/kostyasabada/docs/evidence/README.md
+45eccdb699a397462ff0a9e1beed7ce4e4afdec70f337451e7eb93e738e91a30  submissions/kostyasabada/openspec/config.yaml
+a0b3927f90fb01df3936e47b524e535add556b760780e9eb234d5d2bb128e48c  submissions/kostyasabada/docs/evidence/setup-e2e-decision/implementation.md
+12defb146650a9f24bf7c9f0e2fd53f504d821083f4c06750778cd1797cec3b2  submissions/kostyasabada/docs/evidence/setup-e2e-decision/checks.txt
+# Base commit: e2cb857142168e3cc0a1b800f7acdfd0cc212c32. snapshot.txt itself and review.md are not hashed.

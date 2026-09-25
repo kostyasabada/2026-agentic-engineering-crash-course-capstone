@@ -1,0 +1,30 @@
+# setup-e2e-decision checks
+# Working directory: submissions/kostyasabada/
+# Date: 2026-09-25T15:20:40Z
+# Base commit: e2cb857142168e3cc0a1b800f7acdfd0cc212c32
+
+$ git diff --check
+[exit 0]
+
+$ python3 -c "import yaml,sys;d=yaml.safe_load(open('openspec/config.yaml'));print(type(d['rules']['design']).__name__, [type(x).__name__ for x in d['rules']['design']]);print(d['rules']['design'][-1])"
+list ['str', 'str']
+Specify browser E2E tests with @playwright/test (dev dependency), including configuration, test location, dev server startup, and the exact run command.
+[exit 0]
+
+$ grep -rn --include=package.json -l playwright . ; ls package.json node_modules 2>&1 | head -5
+ls: cannot access 'package.json': No such file or directory
+ls: cannot access 'node_modules': No such file or directory
+[exit 0]
+
+$ npx --yes @fission-ai/openspec@1.13.2 validate --all --strict
+- Validating...
+No items found to validate.
+[exit 0]
+
+$ git status --short
+ M docs/architecture.md
+ M docs/evidence/README.md
+ M docs/testing.md
+ M openspec/config.yaml
+[exit 0]
+

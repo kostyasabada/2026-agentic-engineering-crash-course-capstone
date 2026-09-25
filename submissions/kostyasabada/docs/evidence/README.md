@@ -31,3 +31,10 @@ Source: the conversation during initial setup. Product checks have not taken pla
 - User decision: the project is worked on with both ChatGPT/Codex and Claude Code, and Claude Code must read and follow the same rules and instructions.
 - Action: added `../../CLAUDE.md` importing `../../AGENTS.md`, exposed the six OpenSpec skills at `../../.claude/skills/` as relative symlinks to `../../.agents/skills/`, and added tool-neutral qualifiers to `../../AGENTS.md`, `../review-process.md`, and `../workflow.md`.
 - Source: the user's Claude Code compatibility request in the setup conversation. Implementation and actual checks are recorded in `setup-claude-compat/implementation.md` and `setup-claude-compat/checks.txt`; acceptance requires a separate checker report.
+
+## E2E testing decision
+
+- Task: `setup-e2e-decision`.
+- User decision: browser end-to-end tests use `@playwright/test` as a dev dependency, committed in the project and runnable with a single command so the checker can rerun them independently; the first OpenSpec change's design must detail the setup. Agent-driven browser checks (the personal Codex `playwright` skill or the Claude Code browser) remain supplementary for quick manual checks and screenshots.
+- Action: recorded the decision in `../architecture.md` and `../testing.md`, and added a design rule to `../../openspec/config.yaml`. No dependencies were installed and no tests exist yet.
+- Source: the user's E2E testing request in the setup conversation. Implementation and actual checks are recorded in `setup-e2e-decision/implementation.md` and `setup-e2e-decision/checks.txt`; acceptance requires a separate checker report.

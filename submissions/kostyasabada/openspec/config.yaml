@@ -15,6 +15,7 @@ rules:
     - Add verifiable scenarios for requirements, including failure cases.
   design:
     - Distinguish accepted decisions, proposals, and open questions.
+    - Specify browser E2E tests with @playwright/test (dev dependency), including configuration, test location, dev server startup, and the exact run command.
   tasks:
     - Include appropriate checks and recording of actual results.
     - Keep the main agent as coordinator only; require a fresh maker subagent per task and a separate checker, with scoped context and no full history by default. Follow docs/review-process.md for handoffs, fixes, evidence, and completion criteria.
