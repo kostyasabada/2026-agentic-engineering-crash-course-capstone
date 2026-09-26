@@ -1,0 +1,24 @@
+Task: add-realtime-chat-room-spec
+Revision: round 4
+Snapshot type: file manifest (SHA-256), paths relative to the repository root
+Base commit: cde39ddc390b493c1709ebdc2a2057c7d2b48005 (HEAD at start; the round-1 handoff named its parent c0c46daa4bedbcfd4941018200e66079b267abd9)
+Created: 2026-09-26T07:23:59Z
+Contents: all maker deliverables, new (untracked) and modified (tracked) files. snapshot.txt itself is not listed. review.md is the checker's file, listed separately for reference only.
+
+## Maker deliverables
+92d9a0e5a5f0887bc95607c11766828263a5d0de352318ec9c3c2306c922cd96  submissions/kostyasabada/docs/architecture.md
+aecf6c74b7ab7c3a7ba9b9094cc14d496f8dfceb8be34b07d465d4546b2970c6  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-spec/checks.txt
+7c1c2b17231bf30fd3e90c6762d82f12e85b16c5b98b54e163119c13c04e8374  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-spec/implementation.md
+7c5018a543134a299ff9c9fa9c17d75fbaaaf984647af95a461465c0df61fb82  submissions/kostyasabada/docs/evidence/README.md
+2793479e49cc45cfca4a152e857183c45f2eb7bd8265144f3f0019d9e0b5d5e0  submissions/kostyasabada/docs/testing.md
+37caace31472d53d4149efd0bd30dbff854ccf362a9be5cad21fbabbf8ff051d  submissions/kostyasabada/openspec/changes/add-realtime-chat-room/design.md
+062e545e250441aa0692c22d7a65e07334f1c0f2e706c0e297f36065b6a0699c  submissions/kostyasabada/openspec/changes/add-realtime-chat-room/.openspec.yaml
+633df8298e2e66f112b51e8e922522afc6a90e1a95600df21652b861b956ffc9  submissions/kostyasabada/openspec/changes/add-realtime-chat-room/proposal.md
+515e2f7122df733a937001aa7348399c003e49b0177e7a6ba22291e7e77753e0  submissions/kostyasabada/openspec/changes/add-realtime-chat-room/specs/agent-loop/spec.md
+e670f45528d862eefad5a3a72f37b5c94f434cf9a04f0d0b28aef8b75c32eb9e  submissions/kostyasabada/openspec/changes/add-realtime-chat-room/specs/chat-room/spec.md
+3ea516d91d00d3535878d78927821f3e001b0b35253f1dcbf8ef98792e4c72b3  submissions/kostyasabada/openspec/changes/add-realtime-chat-room/specs/session-context-hook/spec.md
+9384a1ed67c168d9e579e262f7b425bfdf30e3321915d6a7a5ff2c21d978ffaa  submissions/kostyasabada/openspec/changes/add-realtime-chat-room/tasks.md
+8cf0fdf4f08fa7f12c17d833a641530a4ea4c79b71df76d2d328d1bc4516a146  submissions/kostyasabada/openspec/config.yaml
+
+## Reference (checker file, not a maker deliverable)
+8ddfe5b17b303749a9998c1f2f968cf7b851e4fbb89ed7afae175096327a5dab  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-spec/review.md
