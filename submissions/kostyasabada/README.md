@@ -4,16 +4,14 @@ A small educational capstone chat application built using Agentic Engineering pr
 
 ## Current status
 
-Context, OpenSpec, and local development tools are set up. Application code has not been created; application run and test commands are not available yet.
-
-The agreed direction is a chat between people. The initial scope for specification is one room, a nickname without registration, real-time messages, and a history of the latest 100 messages. Detailed behavior will be specified in OpenSpec before implementation.
+The first OpenSpec change, `add-realtime-chat-room` (one room, a nickname without registration, real-time messages, and a history of the latest 100 messages), is being implemented. Its tooling tasks are in place: pinned dependencies, lint, type check, unit and E2E test commands, the custom Node server (`server.ts`) that serves a placeholder Next.js page and answers the Socket.IO handshake, the agent loop script, and the Claude Code `SessionStart` hook. The chat features themselves (nickname, messages, storage, history) are not implemented yet. Requirements and remaining tasks live in `openspec/changes/add-realtime-chat-room/`; `npm run --silent openspec -- list --json` shows progress.
 
 ## Documentation
 
 - `AGENTS.md` — concise rules and a context map.
-- `docs/workflow.md` — working with OpenSpec.
-- `docs/architecture.md` — project organization and technical decision status.
-- `docs/testing.md` — verification approach.
+- `docs/workflow.md` — working with OpenSpec, the agent loop, and the session context hook.
+- `docs/architecture.md` — project organization and technical decisions.
+- `docs/testing.md` — check and test commands.
 - `docs/evidence/` — factual records of work.
 
 Run all project commands from this directory. Leave course files at the repository root unchanged.
@@ -28,12 +26,21 @@ npm run openspec -- --version
 npm run openspec -- list --json
 ```
 
-`package.json` pins OpenSpec, TypeScript, ESLint, Vitest, its required Vite peer, and Playwright Test as development dependencies; `package-lock.json` fixes the dependency tree. Vite supports Vitest here; the chosen application framework remains Next.js. Next.js and React will be added after the first OpenSpec design selects their versions and application setup.
+`package.json` pins every dependency to an exact version and `package-lock.json` fixes the dependency tree: Next.js, React, Socket.IO, `better-sqlite3`, zod, and tsx for the application; OpenSpec, TypeScript, ESLint, Vitest (with its required Vite peer), and Playwright Test for development. `better-sqlite3` is a native addon; if no prebuilt binary matches the platform, `npm ci` needs a C++ toolchain. Browser tests also need Chromium once per machine; see `docs/testing.md`.
 
-To provision the browser for future Playwright tests:
+## Running the application
+
+Development server (on-demand compilation, no build step):
 
 ```bash
-npm exec -- playwright install chromium
+npm run dev
 ```
 
-Browser downloads require network access and use Playwright's user cache outside the repository. Linux hosts also need Playwright's supported system libraries. Tool installation is separate from an application test suite; see `docs/testing.md` for verification status and `docs/workflow.md` for OpenSpec commands.
+Production build and server:
+
+```bash
+npm run build
+npm start
+```
+
+Both run `server.ts` with `tsx` and print `> Ready on http://127.0.0.1:3000 (development)` or `(production)`; open that address in a browser and stop the server with Ctrl+C. `npm start` needs a prior `npm run build`. The server reads `PORT` (default `3000`) and `HOST` (default `127.0.0.1`) from the environment and exits with an error for an invalid value or a port that is already in use. `CHAT_DB_PATH` (default `data/chat.sqlite`, git-ignored) is parsed already but not used until message storage is implemented.

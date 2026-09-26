@@ -14,14 +14,33 @@
 - The user selected Socket.IO as the real-time transport, served together with Next.js by a custom Node server (`server.ts`), over SSE, to keep future messenger features (presence, typing, acknowledgements) possible (2026-09-26). Consequences: some automatic Next.js optimizations are unavailable with a custom server, and deployment requires a regular long-running Node process.
 - The user accepted SQLite for message storage, as proposed and without objection; history survives a server restart (2026-09-26).
 - The user accepted local deployment as a single Node process, as proposed and without objection (2026-09-26). Limitation: in-process Socket.IO broadcast works for one instance only.
-- The user selected TypeScript 6.0.3 and ESLint 9.39.5 to replace the pinned TypeScript 7.0.2 and ESLint 10.11.0, because dependencies of the Next.js ESLint configuration (`typescript-eslint`, `eslint-plugin-react`, `eslint-plugin-import`, `eslint-plugin-jsx-a11y`) do not support the newer versions (2026-09-26). The change is applied by the first implementation task.
+- The user selected TypeScript 6.0.3 and ESLint 9.39.5 to replace the pinned TypeScript 7.0.2 and ESLint 10.11.0, because dependencies of the Next.js ESLint configuration (`typescript-eslint`, `eslint-plugin-react`, `eslint-plugin-import`, `eslint-plugin-jsx-a11y`) do not support the newer versions (2026-09-26). Applied in task 1.1.
 - The user accepted the product defaults proposed in the first OpenSpec change (nickname, message limits, ordering, history, reconnection, plain-text rendering) and the principle that the Socket.IO `Origin` is restricted so a foreign site cannot write to the chat, on 2026-09-26; the requirements live in OpenSpec.
 - The user accepted all design proposals P1–P22 of the first OpenSpec change and resolved its open question Q11 (SQLite driver: `better-sqlite3` 13.0.3) on 2026-09-26 (task `add-realtime-chat-room-0-1`). They include Next.js 16.3.6 with the App Router, the Host/Origin allowlist mechanism, and the agent loop's four stop reasons. The details live in `openspec/changes/add-realtime-chat-room/design.md`; the user's reply is in `evidence/add-realtime-chat-room-0-1/decisions.md`.
 - The user selected a layered server architecture with controllers, services, and repositories, built for extensibility, and an ESLint `no-restricted-imports` rule that prevents `src/app/**` from importing `src/server/**`, added in task 1.3 (2026-09-26). The user then accepted the concrete layout (Proposal P23: feature modules such as `src/server/chat/` with their own controller, service, and repository, a composition root `src/server/app.ts`, a thin `server.ts`, constructor/factory injection), further layer boundaries enforced by ESLint including the controller row and the reverse rule `src/server/**` ↛ `src/app/**` (from a review finding), and the detail rules for `lastSeenId`, `server_error`, id reuse, and `createdAt` (2026-09-26). Accepted trade-off: more structure than a one-room chat needs. Details: `openspec/changes/add-realtime-chat-room/design.md` (D4).
 
+## Implementation status
+
+Confirmed proposals of `add-realtime-chat-room` (design references in parentheses) that exist after tasks 1.1–1.5:
+
+- Pinned dependencies at the accepted versions, including TypeScript 6.0.3, ESLint 9.39.5, and `better-sqlite3` 13.0.3 (D1, P1, P4, P5, P6, P9, P11).
+- `tsconfig.json` (strict), `eslint.config.mjs` with the layer-boundary `no-restricted-imports` rules, `vitest.config.ts`, and `playwright.config.ts` (P2, P12, P13, P15, D4).
+- The custom server `server.ts`: Next.js App Router with a placeholder page (`src/app/`), Socket.IO attached with `destroyUpgrade: false`, explicit request and upgrade dispatchers, and environment parsing in `src/server/config.ts` (P3, P5, P6).
+- The npm scripts, including `check` and `check:loop` (P14, P21); commands are in `testing.md`.
+- The agent loop `scripts/agent-loop.sh` with its Vitest suite (P16, P17, P22) and the `SessionStart` hook `scripts/session-context.sh` registered in `.claude/settings.json` (P18); usage is in `workflow.md`.
+
+Not implemented yet (later tasks of the change): the shared schema `src/lib/chat/`, the SQLite repository, chat service, and controller under `src/server/chat/`, the composition root `src/server/app.ts` with the Host/Origin checks (P19, P23), and the chat UI. `server.ts` is reduced to a thin entry when `app.ts` is added.
+
+## Limitations
+
+- In-process Socket.IO broadcast works for one server instance only; a custom server loses some automatic Next.js optimizations and needs a long-running Node process.
+- `better-sqlite3` is a native addon and may need a C++ toolchain where no prebuilt binary matches.
+- The layered layout adds more structure than a one-room chat needs (accepted trade-off).
+- The Codex fixer (`codex exec`) and Codex session context are unverified because Codex is not installed here (`workflow.md`).
+
 ## Open decisions
 
-The first OpenSpec change's remaining open questions (Q8 Codex `SessionStart` parity, Q10 retention, Q12 E2E technique for catch-up) are deferrable and listed in its design. OpenSpec, TypeScript, ESLint, Vitest (with its Vite peer), and Playwright Test are installed as pinned development dependencies (TypeScript and ESLint still at 7.0.2 and 10.11.0 until the version change above is implemented). Application dependencies, lint/type-check/test configuration, the agent loop script, and the `SessionStart` hook do not exist yet.
+The first OpenSpec change's remaining open questions are deferrable and listed in its design: Q8 Codex `SessionStart` parity (evaluated in task 1.5; no automatic injection configured, limitation documented in `workflow.md`), Q10 retention, and Q12 E2E technique for catch-up.
 
 ## Context management
 

@@ -29,8 +29,9 @@ cli=./node_modules/.bin/openspec
 command -v node >/dev/null 2>&1 || notice 'node not found on PATH'
 command -v timeout >/dev/null 2>&1 || notice 'timeout command not found on PATH'
 
-# OPENSPEC_TELEMETRY=0 is OpenSpec's documented telemetry opt-out; without it the CLI creates
-# its global config file (anonymous id) when none exists and sends a usage event.
+# OPENSPEC_TELEMETRY=0 is OpenSpec's documented telemetry opt-out; without it the CLI sends a
+# usage event once its global config records the telemetry notice as seen, and writes that
+# config only as a one-time copy of ~/.config/openspec/config.json into another XDG_CONFIG_HOME.
 # stdin is closed so the CLI cannot wait for input; stderr is discarded (short reason only).
 output=$(OPENSPEC_TELEMETRY=0 timeout 10 "$cli" list --json </dev/null 2>/dev/null)
 status=$?

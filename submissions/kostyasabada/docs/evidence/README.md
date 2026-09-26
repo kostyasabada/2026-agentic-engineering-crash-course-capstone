@@ -86,3 +86,7 @@ Source: the conversation during initial setup. Product checks have not taken pla
 - User decision (2026-09-26, translated: "yes, I accept both, then commit"), answering the coordinator's question whether to accept the reverse boundary rule `src/server/**` ↛ `src/app/**` (from checker finding F4) and a requirement sentence: both accepted. The chat-room requirement "Connection status and reconnection" now states that a client whose last seen message is newer than the server's newest message shows the server's latest messages, up to 100.
 - Action: updated `../../openspec/changes/add-realtime-chat-room/design.md` and `tasks.md` (tasks 1.3, 3.1, new 3.2, 4.1, 4.2, and in round 2 also 5.3), `../architecture.md`, and in rounds 2 and 3 one scenario and one requirement sentence in `specs/chat-room/spec.md`. The proposal was not changed, because it does not reference module layout or file names. No code was changed.
 - Source: the user's message on 2026-09-26, relayed by the coordinator. Implementation and actual checks are recorded in `add-realtime-chat-room-layered-arch/implementation.md` and `add-realtime-chat-room-layered-arch/checks.txt`; acceptance requires a separate checker report.
+
+## User-run session observation
+
+- Task 1.5 follow-up (recorded in task `add-realtime-chat-room-1-6`): the user's report of a new Claude Code session after commit `47ece6d`, confirming that the model received the `SessionStart` hook context, is in `add-realtime-chat-room-1-5/user-session-observation.md`.

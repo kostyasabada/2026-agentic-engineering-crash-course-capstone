@@ -1,0 +1,18 @@
+Task add-realtime-chat-room-1-6 — review snapshot, revision 2 (round 2: one sentence restored in docs/testing.md)
+Base commit: 47ece6d (47ece6dd065b5c472c6540e784b59fd9a36a6255); uncommitted working tree.
+Paths are relative to submissions/kostyasabada/ (run `sha256sum -c` from there). This file does not list itself.
+Not listed: review.md (checker) and openspec/changes/add-realtime-chat-room/tasks.md (coordinator checkbox tick, not a maker deliverable).
+Revision 1 hashes are superseded; unchanged files keep the same hash.
+Created by the maker (Claude Code general-purpose subagent) on 2026-09-26 with:
+  sha256sum <paths below>
+
+b1d9469c2163ea3b56362cf1aff81c8ff5d87e422f89bb139b457770e017c47c  README.md
+9c231ce959bc45cb46d4b61342c366f351bd85f91637e62920f4770e773a5932  docs/architecture.md
+8f57640bbeac2c0025ebc666caf3b87bba222bc4ca0ecf68823b52fe4a5ed718  docs/testing.md
+195e906df5b66bbbd8b98d5019f8f654df297d4c9c9df845e082048c46ce8d4e  docs/workflow.md
+6a463cebe28c9c03c6ba69a351fb382440c134a885e44cb602a85e2e1d7a661e  docs/evidence/README.md
+e5a874fbd589dc5df6f157e1dab942cf833a26593d0be0b9655bd03ab4ae8d79  openspec/changes/add-realtime-chat-room/design.md
+2a42cc0201912f1728b5681f39995c5754253cffa35f58af0177b60fa331709d  scripts/session-context.sh
+53c11512bb06c8e1be60ce6e9765206a1ef326e0077e5109032cccecf28f51ec  docs/evidence/add-realtime-chat-room-1-5/user-session-observation.md
+749c842a6309a35c5dd315e8d56789dc86deb7502ca98e89261febddaf1121e3  docs/evidence/add-realtime-chat-room-1-6/implementation.md
+5d974bfebb136faba7f419546e6c77c1f0926444e61640b3f72fe339ef9326e5  docs/evidence/add-realtime-chat-room-1-6/checks.txt
