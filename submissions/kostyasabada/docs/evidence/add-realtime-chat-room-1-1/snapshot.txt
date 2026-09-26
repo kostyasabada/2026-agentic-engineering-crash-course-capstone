@@ -1,0 +1,9 @@
+# Snapshot for add-realtime-chat-room-1-1 (revision 2: round 2 evidence fixes; package.json, package-lock.json, .gitignore unchanged since revision 1)
+base_commit: 1c60396
+paths relative to the repository root; sha256sum output; nothing staged or committed
+
+50111b00f1d523d3dab4b19b137826c29ece92b4846ed675700f8b2769ce78ce  submissions/kostyasabada/package.json
+00905d458469ed989a572ca4f54c1c362645183fbf6a41667b824d49503223af  submissions/kostyasabada/package-lock.json
+064b03e1d1f1e7305051334b33d1fdc9e3ab4f0fa0f8dfd53e366ee30c176c08  submissions/kostyasabada/.gitignore
+6df938bc9eca9c61d59c2a2a84ac496f4edf948a926707195692a612f269a11a  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-1-1/implementation.md
+7fbc45cf32480bf548060efe4debd8cadc4b297b10734faeee6cfb7d98ec46d1  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-1-1/checks.txt
