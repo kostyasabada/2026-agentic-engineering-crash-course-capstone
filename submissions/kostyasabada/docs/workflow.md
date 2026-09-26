@@ -49,6 +49,12 @@ npm run --silent openspec -- validate --all --strict
 
 This process description is not evidence of an executed automated loop. Claiming loop engineering requires a reproducible mechanism and a record of an actual run.
 
-An agent loop script and a Claude Code `SessionStart` context hook are planned for the first OpenSpec change (see `architecture.md`); neither exists yet.
+The first OpenSpec change adds the agent loop script `scripts/agent-loop.sh` (see `architecture.md`) and a session context hook (next section).
 
 Documentation: https://github.com/Fission-AI/OpenSpec.
+
+## Session context hook
+
+The committed project settings `.claude/settings.json` register a Claude Code `SessionStart` hook (sources `startup`, `resume`, `clear`, `compact`) that runs `scripts/session-context.sh`. The script runs the pinned CLI directly, `OPENSPEC_TELEMETRY=0 ./node_modules/.bin/openspec list --json`, and prints its output, which Claude Code adds to the new session's context. It does not use `npm run`, because npm writes debug logs under `~/.npm/_logs` on every run, and the telemetry opt-out keeps OpenSpec from creating its global config file (user decision, design D8). If the CLI or `node` is missing, the command fails, or it takes longer than 10 seconds, the script prints a one-line notice with the manual command (`npm run --silent openspec -- list --json`) instead; it always exits 0 and writes no files. Requirements: `openspec/changes/add-realtime-chat-room/specs/session-context-hook/spec.md`. In a real Claude Code 2.1.198 session the hook ran and its output was recorded, but that session could not authenticate, so the model receiving the text has not been observed yet; a user-run session is planned as follow-up evidence (`docs/evidence/add-realtime-chat-room-1-5/hook-output.txt`).
+
+Codex: no automatic injection is configured. Codex is not installed in this environment (`command -v codex` fails), so no installed version's `--help` could be checked. The official Codex hooks documentation (https://learn.chatgpt.com/docs/hooks, redirected from https://developers.openai.com/codex/hooks, read 2026-09-26) describes a comparable `SessionStart` hook in `<repo>/.codex/hooks.json` or `.codex/config.toml`: plain-text stdout becomes extra developer context, commands run in the session's working directory, and project hooks run only after the user reviews and trusts them (`/hooks`). This equivalent has not been configured or run here, so parity is not claimed. Until a verified run exists, Codex agents run `npm run --silent openspec -- list --json` themselves at the start of a task.

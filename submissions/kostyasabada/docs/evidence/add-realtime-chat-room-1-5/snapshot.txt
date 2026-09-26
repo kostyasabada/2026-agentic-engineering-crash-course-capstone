@@ -1,0 +1,12 @@
+# Snapshot for add-realtime-chat-room-1-5 (revision 2)
+base_commit: ffa55a1
+paths relative to the repository root; sha256sum output; nothing staged or committed; snapshot.txt itself and review.md are not part of the snapshot
+revision 1: settings.json 02504e4ba2d900101740a7d212fa438c845b81181227182f95312a64598d3aad, session-context.sh afa55927fccbb190e0db47e9cb92b8007861eac6fecf18b4c38525e01d4b1628, workflow.md 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b (the emptied file, see implementation.md), implementation.md 87d8c3833b83b1ab752821b60c16bb1efd6ad3ab25d9341c6c08bb7fbdd0ce6f, checks.txt 36764293cc4b992baa36f1f04478fab42c20bfb0af014a9d6065ebb2250c5f1d, hook-output.txt d65a94d1d92c587cb5865dc8bd088be8ddb726b512c963214ad49b1d4e6972c9
+
+02504e4ba2d900101740a7d212fa438c845b81181227182f95312a64598d3aad  submissions/kostyasabada/.claude/settings.json
+6cdc4df1c8280c6ccc3b3d7c6182735253b2d81847f7431fe22aa2605d5cf4f3  submissions/kostyasabada/scripts/session-context.sh
+c588281af5915f349ff1dfa98ec6538cbc82f3d091c89b67dec8f80f7e4986da  submissions/kostyasabada/docs/workflow.md
+7146a03d89c67bdb7cb2dbcadfac62cbfe4cf116d4b50ddc2618763d9355fefa  submissions/kostyasabada/openspec/changes/add-realtime-chat-room/design.md
+1bed8f870d731e09682cb11c075d8de32ee1dc37e87bb9241255e91a13bc4767  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-1-5/implementation.md
+7f13a53445d447074ee0474815bb620a22ba5b7a0f859778fd9203db790a9be9  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-1-5/checks.txt
+eeccf7ea0ce523b844245c43dcc93b3d853270af229c892d0a9393ea1bb0c1e0  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-1-5/hook-output.txt

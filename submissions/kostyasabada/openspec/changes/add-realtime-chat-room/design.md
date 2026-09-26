@@ -269,15 +269,16 @@ iteration=1 phase=full_check exit=0 result=pass duration_s=95
 }
 ```
 
-- **Command:** `scripts/session-context.sh` changes to `$CLAUDE_PROJECT_DIR` (falling back to the script's parent directory) and runs `timeout 10 npm run --silent openspec -- list --json` — the pinned local CLI per `docs/workflow.md`; never `npx --yes`, which could download.
+- **Command:** `scripts/session-context.sh` changes to `$CLAUDE_PROJECT_DIR` (falling back to the project root, the parent of `scripts/`) and runs `OPENSPEC_TELEMETRY=0 timeout 10 ./node_modules/.bin/openspec list --json` — the project-pinned CLI binary directly; never `npx --yes`, which could download.
+  - **User decision (2026-09-26, task 1.5 round 2):** "1 — напряму через node_modules" ("1 — directly via node_modules"). The command was changed from `timeout 10 npm run --silent openspec -- list --json` because every `npm run` writes and rotates debug logs under `~/.npm/_logs`, which conflicts with the no-side-effects requirement. `OPENSPEC_TELEMETRY=0` is OpenSpec's documented telemetry opt-out: without it, the CLI creates its global config file (`openspec/config.json` with an anonymous id) when none exists, as observed in task 1.5.
 - **Output:** on success, stdout (added to context by Claude Code for `SessionStart`):
 
 ```
-Active OpenSpec changes (from `npm run --silent openspec -- list --json`):
+Active OpenSpec changes (from `./node_modules/.bin/openspec list --json`):
 { "changes": [ ... ], "root": { ... } }
 ```
 
-- **Failure behavior:** on non-zero exit, timeout, or missing `node_modules`, print `Active OpenSpec changes could not be loaded (<reason>). Run: npm run --silent openspec -- list --json` and exit 0. The script never writes files, never installs, and discards the CLI's stderr from context (a short reason only).
+- **Failure behavior:** on non-zero exit, timeout, empty output, missing `node_modules/.bin/openspec`, or `node` not on `PATH`, print `Active OpenSpec changes could not be loaded (<reason>). Run: npm run --silent openspec -- list --json` and exit 0 (the notice names the npm script because a person runs it manually). The script never writes files, never installs, and discards the CLI's stderr from context (a short reason only).
 - **Codex parity: unknown (open question Q8).** Codex is not installed in this environment, so whether the current Codex CLI offers an equivalent session-start hook could not be checked. The hook task must check the installed Codex version's documentation/`--help`. If an equivalent exists, configure it only after a verified run; otherwise document in `docs/workflow.md` that Codex has no automatic injection and that Codex agents run `npm run --silent openspec -- list --json` themselves (Open question Q8). Parity must not be claimed without a verified run.
 
 ### D9. Documentation updates
