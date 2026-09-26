@@ -1,0 +1,11 @@
+# Snapshot for add-realtime-chat-room-layered-arch (revision 4: round 4, trailing blank line removed from checks.txt)
+base_commit: 3b12640
+paths relative to the repository root; sha256sum output; nothing staged or committed; review.md is not part of the snapshot
+
+6e887dc8a676ded388d0aec523b11ac461808ae40751f8ca60ce9516f600c5bf  submissions/kostyasabada/openspec/changes/add-realtime-chat-room/design.md
+75b249d25f53de3344e8881bc22f70bb4d7407f07aea99c0b1cf2a8b61a076dd  submissions/kostyasabada/openspec/changes/add-realtime-chat-room/tasks.md
+86063f2f933ffce8f737c6568dc2fb56e5ba307542834649cc84ccb996d5e249  submissions/kostyasabada/openspec/changes/add-realtime-chat-room/specs/chat-room/spec.md
+d705ef447a797451c11ed86f5b143f9d53351b1b185746dd5b0c991097e86aa1  submissions/kostyasabada/docs/architecture.md
+d5545401ae05a810aa3c25296f886fdc858a2be698fa9a1616bd548b6c238bcf  submissions/kostyasabada/docs/evidence/README.md
+3315bfca2518e76acfd7fb865bc2c39f111a395e1b1d07864fd901eb3dbc4cd1  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-layered-arch/implementation.md
+f70e29e8bec773509431bb8fea9e4a0f7187607234e9355df66d5af59920d0d6  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-layered-arch/checks.txt

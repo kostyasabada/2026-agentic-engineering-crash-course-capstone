@@ -156,7 +156,7 @@ Accepted messages SHALL be stored durably before they are broadcast, so that sto
 - **THEN** the client shows the same latest messages, in the same order, with the same nicknames, texts, and timestamps
 
 ### Requirement: Connection status and reconnection
-The system SHALL show the person the current connection state as `Connected`, `Reconnecting`, or `Disconnected`. While not connected, sending MUST be disabled and the typed text MUST be kept; messages are not queued for later sending. The client SHALL try to reconnect automatically. After reconnecting, the client SHALL receive the messages accepted while it was disconnected, without duplicates, in order; if more than 100 messages were missed, the client SHALL show the latest 100 messages instead.
+The system SHALL show the person the current connection state as `Connected`, `Reconnecting`, or `Disconnected`. While not connected, sending MUST be disabled and the typed text MUST be kept; messages are not queued for later sending. The client SHALL try to reconnect automatically. After reconnecting, the client SHALL receive the messages accepted while it was disconnected, without duplicates, in order; if more than 100 messages were missed, the client SHALL show the latest 100 messages instead. If the client's last seen message is newer than the server's newest message, the client SHALL show the server's latest messages, up to 100, instead.
 
 #### Scenario: Connection loss is visible
 - **WHEN** a connected client loses its connection to the server
@@ -174,6 +174,10 @@ The system SHALL show the person the current connection state as `Connected`, `R
 #### Scenario: More than 100 missed messages
 - **WHEN** client B last saw message 10, is disconnected while messages 11 to 150 are accepted, and then reconnects
 - **THEN** client B shows exactly messages 51 to 150, oldest first, and no earlier message
+
+#### Scenario: Last seen message is newer than the server's history
+- **WHEN** a client that last saw message 120 reconnects to a server whose newest message is message 30 (for example, because the database was reset)
+- **THEN** the client replaces its list with the server's latest messages, up to 100, oldest first, and shows none of the messages it had before
 
 #### Scenario: Reconnect after server restart
 - **WHEN** the server restarts while clients are open
