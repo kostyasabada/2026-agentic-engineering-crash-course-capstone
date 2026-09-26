@@ -10,6 +10,7 @@
 - Run appropriate checks before completion. Report actual results, failures, and anything not verified.
 - The main agent coordinates only: spawn a fresh maker subagent for each task and a separate checker, each with scoped context and no full history by default (Codex: `fork_turns="none"`; Claude Code: see `CLAUDE.md`). Follow `docs/review-process.md`; complete tasks only with evidence and checker acceptance of the final revision.
 - Never invent test results, reviews, iterations, or user decisions.
+- Commit only with the user's approval: no agent commits, pushes, amends, rebases, resets, or otherwise rewrites history unless the user explicitly asks for that specific commit in the current conversation. Before committing, the coordinator shows the changed files (`git status --short`, `git diff --stat`) and waits for explicit approval. Approval covers one commit only; checker acceptance is not approval. Where other documents say to commit, this rule applies.
 - Installed skills follow these project ownership and completion rules. In generated OpenSpec instructions, implementation and artifact-writing steps belong to the maker; completion checkboxes and archive readiness require separate checker acceptance of the final snapshot. Read `docs/workflow.md` for invocation and integration details.
 
 ## Context map — read as needed

@@ -1,0 +1,108 @@
+# setup-commit-approval checks (run from submissions/kostyasabada/, base commit e66917e)
+
+## grep for "commit" BEFORE edits (captured at base e66917e, before any change; up to 50 chars of context per match)
+$ /usr/bin/grep -rnioE ".{0,50}commit.{0,50}" AGENTS.md CLAUDE.md docs/review-process.md docs/workflow.md docs/architecture.md docs/testing.md openspec/config.yaml openspec/changes/add-realtime-chat-room/
+AGENTS.md:4:tion, specifications, code comments, UI text, and commit messages. Continue conversations in the user's la
+AGENTS.md:6:cations must precede code; preserve this order in commits.
+docs/review-process.md:22:3. Freeze the review scope at a commit SHA or a file manifest containing SHA-256 hashes.
+docs/review-process.md:36:- `snapshot.txt`: commit SHA or file paths and SHA-256 hashes for the revi
+docs/workflow.md:11:NTS.md` and `docs/review-process.md`. Prepare and commit specifications before implementation even when a 
+docs/workflow.md:43:3. Prepare and commit the artifacts before implementation. Discuss unre
+docs/architecture.md:10:t` (dev dependency) for browser end-to-end tests, committed in the project and runnable with a single comm
+docs/architecture.md:11: real task must run through the loop with its log committed. Ownership (user decision): the task's maker l
+openspec/config.yaml:24:uns a real task through scripts/agent-loop.sh and commits its docs/evidence/<task-id>/loop-run.log, and a 
+openspec/changes/add-realtime-chat-room/specs/agent-loop/spec.md:82: limit, fast and full check commands, and the Git commit at start), one entry per check and fixer run (ite
+openspec/changes/add-realtime-chat-room/specs/agent-loop/spec.md:93: mark tasks complete, edit `tasks.md` checkboxes, commit, push, or write review verdicts. Its final messag
+openspec/changes/add-realtime-chat-room/specs/agent-loop/spec.md:97:- **THEN** no task checkbox, commit, or review file is changed by the script, and its
+openspec/changes/add-realtime-chat-room/specs/session-context-hook/spec.md:10:onfigure a Claude Code `SessionStart` hook in the committed project settings that runs the project-pinned 
+openspec/changes/add-realtime-chat-room/design.md:67:new` | `ChatMessage` | Broadcast after the row is committed. |
+openspec/changes/add-realtime-chat-room/design.md:146:t` (dev dependency, already pinned at 1.63.0) for committed browser E2E tests runnable with one command; a
+openspec/changes/add-realtime-chat-room/design.md:157: least one real task runs through it with the log committed. The **task maker launches the loop**, not the
+openspec/changes/add-realtime-chat-room/design.md:172:s; do not weaken or delete tests or specs; do not commit, push, edit `tasks.md`, or write review files; st
+openspec/changes/add-realtime-chat-room/design.md:176:dex's sandbox/approval bypass. No network or `git commit`/`git push` permission is granted to the fixer. T
+openspec/changes/add-realtime-chat-room/design.md:178:s as progress, whether it is untracked or already committed): `git status --porcelain=v1 --untracked-files
+openspec/changes/add-realtime-chat-room/design.md:198:l P18 — configuration** (`.claude/settings.json`, committed):
+openspec/changes/add-realtime-chat-room/design.md:250:ng to migrate. Rollback is reverting the change's commits. The SQLite file under `data/` is local runtime 
+openspec/changes/add-realtime-chat-room/tasks.md:14:t changes nothing while `loop-run.log` is already committed and gets appended still stops with `no_progres
+openspec/changes/add-realtime-chat-room/tasks.md:14:/entries/footer; append-only log; and no checkbox/commit changes. Confirm the real CLI flags with `claude 
+openspec/changes/add-realtime-chat-room/tasks.md:20:so the fixer implements `src/lib/chat/schema.ts`; commit `docs/evidence/add-realtime-chat-room-2-1/loop-ru
+openspec/changes/add-realtime-chat-room/tasks.md:40:- [ ] 6.1 From a clean checkout of the final commit, run `npm ci`, `npm exec -- playwright install ch
+exit: 0
+
+## grep for "commit" AFTER edits
+$ /usr/bin/grep -rnioE ".{0,50}commit.{0,50}" AGENTS.md CLAUDE.md docs/review-process.md docs/workflow.md docs/architecture.md docs/testing.md openspec/config.yaml openspec/changes/add-realtime-chat-room/
+AGENTS.md:4:tion, specifications, code comments, UI text, and commit messages. Continue conversations in the user's la
+AGENTS.md:6:cations must precede code; preserve this order in commits.
+AGENTS.md:13:- Commit only with the user's approval: no agent commits, pushes, amends, rebases, resets, or otherwise r
+AGENTS.md:13:unless the user explicitly asks for that specific commit in the current conversation. Before committing, t
+AGENTS.md:13: waits for explicit approval. Approval covers one commit only; checker acceptance is not approval. Where o
+AGENTS.md:13:ther documents say to commit, this rule applies.
+docs/review-process.md:5:. It may orchestrate tools, Git, and integration (commits only with the user's approval, see `../AGENTS.md
+docs/review-process.md:22:3. Freeze the review scope at an existing commit SHA or a file manifest containing SHA-256 hashes.
+docs/review-process.md:36:- `snapshot.txt`: commit SHA or file paths and SHA-256 hashes for the revi
+docs/workflow.md:11:NTS.md` and `docs/review-process.md`. Prepare and commit specifications before implementation even when a 
+docs/workflow.md:11:generated skill permits interleaving; commits require the user's approval (`AGENTS.md`). Durin
+docs/workflow.md:43:pare the artifacts and, with the user's approval, commit them before implementation. Discuss unresolved pr
+docs/architecture.md:10:t` (dev dependency) for browser end-to-end tests, committed in the project and runnable with a single comm
+docs/architecture.md:11: real task must run through the loop with its log committed. Ownership (user decision): the task's maker l
+openspec/config.yaml:24:uns a real task through scripts/agent-loop.sh and commits its docs/evidence/<task-id>/loop-run.log (commit
+openspec/changes/add-realtime-chat-room/specs/agent-loop/spec.md:82: limit, fast and full check commands, and the Git commit at start), one entry per check and fixer run (ite
+openspec/changes/add-realtime-chat-room/specs/agent-loop/spec.md:93: mark tasks complete, edit `tasks.md` checkboxes, commit, push, or write review verdicts. Its final messag
+openspec/changes/add-realtime-chat-room/specs/agent-loop/spec.md:97:- **THEN** no task checkbox, commit, or review file is changed by the script, and its
+openspec/changes/add-realtime-chat-room/specs/session-context-hook/spec.md:10:onfigure a Claude Code `SessionStart` hook in the committed project settings that runs the project-pinned 
+openspec/changes/add-realtime-chat-room/design.md:67:new` | `ChatMessage` | Broadcast after the row is committed. |
+openspec/changes/add-realtime-chat-room/design.md:146:t` (dev dependency, already pinned at 1.63.0) for committed browser E2E tests runnable with one command; a
+openspec/changes/add-realtime-chat-room/design.md:157: least one real task runs through it with the log committed. The **task maker launches the loop**, not the
+openspec/changes/add-realtime-chat-room/design.md:172:s; do not weaken or delete tests or specs; do not commit, push, edit `tasks.md`, or write review files; st
+openspec/changes/add-realtime-chat-room/design.md:176:dex's sandbox/approval bypass. No network or `git commit`/`git push` permission is granted to the fixer. T
+openspec/changes/add-realtime-chat-room/design.md:178:s as progress, whether it is untracked or already committed): `git status --porcelain=v1 --untracked-files
+openspec/changes/add-realtime-chat-room/design.md:198:l P18 — configuration** (`.claude/settings.json`, committed):
+openspec/changes/add-realtime-chat-room/design.md:250:ng to migrate. Rollback is reverting the change's commits. The SQLite file under `data/` is local runtime 
+openspec/changes/add-realtime-chat-room/tasks.md:14:t changes nothing while `loop-run.log` is already committed and gets appended still stops with `no_progres
+openspec/changes/add-realtime-chat-room/tasks.md:14:/entries/footer; append-only log; and no checkbox/commit changes. Confirm the real CLI flags with `claude 
+openspec/changes/add-realtime-chat-room/tasks.md:20:ime-chat-room-2-1/loop-run.log` unedited so it is committed as is (with the user's approval, per `AGENTS.m
+openspec/changes/add-realtime-chat-room/tasks.md:40:- [ ] 6.1 From a clean checkout of the final commit, run `npm ci`, `npm exec -- playwright install ch
+exit: 0
+
+## grep for "commit" in docs/evidence/README.md AFTER edits (historical entries left unchanged; new entry added)
+$ /usr/bin/grep -nioE ".{0,50}commit.{0,50}" docs/evidence/README.md
+5:action, actual result, and a reference to a file, commit, or saved output. Do not hide errors or unsuccess
+38:tests use `@playwright/test` as a dev dependency, committed in the project and runnable with a single comm
+45:st one real task must run through it with the log committed, and loop results still need separate checker 
+64:## Commit approval decision
+66:- Task: `setup-commit-approval`.
+67: Ukrainian, translated: "make a rule: do not make commits without me. I want to see the changed files"): n
+67:dinator, maker, or checker; Claude Code or Codex) commits, pushes, amends, rebases, resets, or otherwise r
+67:unless the user explicitly asks for that specific commit in the current conversation. Before committing, t
+67: waits for explicit approval. Approval covers one commit only, and checker acceptance is not approval to c
+68:- Trigger: the coordinator had committed `e66917e` (the `add-realtime-chat-room` OpenSp
+69:and short cross-references where documents say to commit: `../review-process.md`, `../workflow.md`, `../..
+70:entation and actual checks are recorded in `setup-commit-approval/implementation.md` and `setup-commit-app
+exit: 0
+
+$ git diff --check
+exit: 0
+
+$ python3 -c (PyYAML parse of openspec/config.yaml, list rules.tasks)
+rules.tasks: 3 items, all strings: True
+1. Include appropriate checks and recording of actual results.
+2. Keep the main agent as coordinator only; require a fresh maker subagent per task and a separate checker, with scoped context and no full history by default. Follow docs/review-process.md for handoffs, fixes, evidence, and completion criteria.
+3. Include a task that runs a real task through scripts/agent-loop.sh and commits its docs/evidence/<task-id>/loop-run.log (commits only with the user's approval, per AGENTS.md), and a task that records the actual output of the SessionStart hook as evidence. A loop result still requires separate checker acceptance.
+exit: 0
+
+$ npm run --silent openspec -- validate --all --strict
+- Validating...
+✓ change/add-realtime-chat-room
+Totals: 1 passed, 0 failed (1 items)
+exit: 0
+
+$ git status --short --untracked-files=all
+ M AGENTS.md
+ M docs/evidence/README.md
+ M docs/review-process.md
+ M docs/workflow.md
+ M openspec/changes/add-realtime-chat-room/tasks.md
+ M openspec/config.yaml
+?? docs/evidence/setup-commit-approval/checks.txt
+?? docs/evidence/setup-commit-approval/implementation.md
+exit: 0

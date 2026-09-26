@@ -8,7 +8,7 @@ The approved `playwright` and `security-best-practices` skills from `openai/skil
 
 Start a Codex task with `submissions/kostyasabada/` as its working directory to discover the submission's OpenSpec skills. Repository skill discovery scans from the working directory upward, so a task launched at the course repository root should not be assumed to discover skills in this child directory. In the desktop app, select the skill from the skills UI when available; CLI/IDE users can mention `$openspec-propose`, for example. Installed files and CLI behavior were verified, but runtime discovery and invocation in a new task have not been tested. See [official skill documentation](https://learn.chatgpt.com/docs/build-skills).
 
-Generated instructions remain upstream files. Their task-writing and implementation steps are performed by a fresh maker, while the main agent coordinates. Apply's immediate completion/checkmark examples only apply after the separate checker accepts the final snapshot, as required by `AGENTS.md` and `docs/review-process.md`. Prepare and commit specifications before implementation even when a generated skill permits interleaving. During archive, delegate spec synchronization synchronously, wait for the maker and independent checker, and only then move the change. A CLI `all_done` state alone is not review evidence. Recheck these rules after regenerating the integration.
+Generated instructions remain upstream files. Their task-writing and implementation steps are performed by a fresh maker, while the main agent coordinates. Apply's immediate completion/checkmark examples only apply after the separate checker accepts the final snapshot, as required by `AGENTS.md` and `docs/review-process.md`. Prepare and commit specifications before implementation even when a generated skill permits interleaving; commits require the user's approval (`AGENTS.md`). During archive, delegate spec synchronization synchronously, wait for the maker and independent checker, and only then move the change. A CLI `all_done` state alone is not review evidence. Recheck these rules after regenerating the integration.
 
 ## Claude Code
 
@@ -40,7 +40,7 @@ npm run --silent openspec -- validate --all --strict
 
 1. Create a separate change for an agreed task.
 2. Use `status` and `instructions` to obtain current artifact requirements for proposal, specs, design, and tasks. Do not invent the format.
-3. Prepare and commit the artifacts before implementation. Discuss unresolved product decisions with the user.
+3. Prepare the artifacts and, with the user's approval, commit them before implementation. Discuss unresolved product decisions with the user.
 4. The main agent coordinates only and spawns a fresh maker subagent for each task with scoped context and no full history by default. The maker implements the task and records actual check results. Follow `docs/review-process.md` for handoffs, evidence, and review snapshots, including specification tasks.
 5. Spawn a separate checker with scoped context. Return findings to that task's maker and obtain checker acceptance of the final snapshot before marking the task complete.
 6. Archive the completed change following CLI guidance, merging requirements into `openspec/specs/`.

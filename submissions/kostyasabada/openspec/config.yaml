@@ -21,4 +21,4 @@ rules:
   tasks:
     - Include appropriate checks and recording of actual results.
     - Keep the main agent as coordinator only; require a fresh maker subagent per task and a separate checker, with scoped context and no full history by default. Follow docs/review-process.md for handoffs, fixes, evidence, and completion criteria.
-    - Include a task that runs a real task through scripts/agent-loop.sh and commits its docs/evidence/<task-id>/loop-run.log, and a task that records the actual output of the SessionStart hook as evidence. A loop result still requires separate checker acceptance.
+    - Include a task that runs a real task through scripts/agent-loop.sh and commits its docs/evidence/<task-id>/loop-run.log (commits only with the user's approval, per AGENTS.md), and a task that records the actual output of the SessionStart hook as evidence. A loop result still requires separate checker acceptance.

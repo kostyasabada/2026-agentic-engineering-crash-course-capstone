@@ -2,7 +2,7 @@
 
 ## Roles
 
-- Coordinator: the main agent tracks scope, delegates tasks, receives results, and reports completion. It may orchestrate tools, Git, and integration, but does not implement task deliverables or silently edit them after accepted review.
+- Coordinator: the main agent tracks scope, delegates tasks, receives results, and reports completion. It may orchestrate tools, Git, and integration (commits only with the user's approval, see `../AGENTS.md`), but does not implement task deliverables or silently edit them after accepted review.
 - Maker: a fresh, separate subagent for each task implements its deliverables, runs appropriate checks, and records evidence. Return fixes to that task's maker; use a fresh maker for unrelated tasks.
 - Checker: a separate subagent, distinct from the coordinator and maker, reviews requirements, changed files, and evidence, and independently runs appropriate checks. A second pass by the maker does not qualify.
 - Agent loop: fix iterations run by the loop (see `architecture.md`) are part of the maker's work. A green loop is not checker acceptance; the checker also reviews the task's `loop-run.log`.
@@ -19,7 +19,7 @@ Each agent returns its changes or findings, actual checks and results, evidence 
 
 1. Identify the task and acceptance criteria, with a link to its OpenSpec task when available. For setup work before an OpenSpec change exists, use a descriptive setup task ID.
 2. Spawn a fresh maker with the scoped handoff. The maker implements the task and saves actual check results.
-3. Freeze the review scope at a commit SHA or a file manifest containing SHA-256 hashes. Include all changed files, including untracked files. Store the snapshot in the task evidence directory.
+3. Freeze the review scope at an existing commit SHA or a file manifest containing SHA-256 hashes. Include all changed files, including untracked files. Store the snapshot in the task evidence directory.
 4. Spawn a separate checker with the scoped handoff, snapshot, and maker report. The checker reads the underlying requirements and changes rather than relying only on the maker summary.
 5. The checker records findings, independently executed checks, limitations, and a verdict: `accepted`, `changes requested`, or `blocked`. The checker does not silently repair the maker's work.
 6. Return findings to the same task maker to resolve; the checker reviews the updated snapshot and reruns affected checks. Preserve previous findings and their resolution.
