@@ -1,0 +1,19 @@
+# Snapshot for add-realtime-chat-room-1-2 (revision 2: round 2 fixes for review findings 1, 3, 4)
+base_commit: 36275d4
+paths relative to the repository root; sha256sum output; nothing staged or committed; review.md is not part of the snapshot
+
+9b76db434704a63608650c33fbec92bbf68db50599200f4ae7e67f739fb5b81a  submissions/kostyasabada/package.json
+ee3413b3096b48d4fad912a87f1871517b475527a521c6518d89ef5e96a6c17b  submissions/kostyasabada/tsconfig.json
+b27e5f9de98cd9e65221248ad32270a1044148480a1bda825dbccc6ed14d89c1  submissions/kostyasabada/eslint.config.mjs
+3828bab547161fc792fc08c5a93471f7a74ba8032ac815ae632740259828e2b0  submissions/kostyasabada/vitest.config.ts
+58e7dd5c8e5f7d473d05847fb460a78d17f47d650ce24d96d467170f17c593a1  submissions/kostyasabada/playwright.config.ts
+34e6e615284b5fdce31902f1f6281f0370ad58eb6d38cf036b16d1e0912f8e8f  submissions/kostyasabada/server.ts
+cdd16c097c06376f6f1b3b8bced307621b27c70d2989ac29708a0a89df572358  submissions/kostyasabada/src/app/layout.tsx
+5d029a667c3eaf343eb623d642fa27757c56b14db963bb3b8cddd671de66ab16  submissions/kostyasabada/src/app/page.tsx
+ef2d114eff42be3c46190e440ca4661105e9111ca5cab78c3dcf9c4e6a02c132  submissions/kostyasabada/src/server/config.ts
+9562a7df7afcb808fd4aaee5e820117d65570f3a83427271e004351348002539  submissions/kostyasabada/src/server/config.test.ts
+8388a6c6f8f05cc9ca3f65f099bdbb9ca8a016958c8af0f8401eed5f3cb994e9  submissions/kostyasabada/e2e/fixtures/chat-server.ts
+2fa26680c5e05483b2f3b5131f89c610d5fe47884ad743a49961d776939f7781  submissions/kostyasabada/e2e/smoke.spec.ts
+9058eba72488a117ff14ffd976f676af84e940f83b5f4a2a5ceb8d54b4a97749  submissions/kostyasabada/e2e/startup.spec.ts
+b71a6dba074dec68870183ca0c3a00843186ea5de0576bf3aa8fcccff81fdcd4  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-1-2/implementation.md
+0ae41ece162ed8c7114042a2b625cda954f60040222dfe4d0b766fd7abcf8f65  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-1-2/checks.txt

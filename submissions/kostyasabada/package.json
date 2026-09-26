@@ -7,7 +7,15 @@
     "npm": ">=9"
   },
   "scripts": {
-    "openspec": "openspec"
+    "openspec": "openspec",
+    "dev": "NODE_ENV=development tsx server.ts",
+    "build": "next build",
+    "start": "NODE_ENV=production tsx server.ts",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test:unit": "vitest run",
+    "test:e2e": "next build && playwright test",
+    "test:e2e:dev": "E2E_SERVER_MODE=dev playwright test"
   },
   "devDependencies": {
     "@fission-ai/openspec": "1.13.2",
