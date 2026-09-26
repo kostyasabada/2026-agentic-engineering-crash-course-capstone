@@ -13,7 +13,7 @@
 
 ## Open decisions
 
-The Next.js version, router, message transport, storage, and deployment approach will be defined in the design of the first OpenSpec change. Socket.IO and SQLite remain preliminary suggestions. No dependencies, including Playwright, have been installed, and the agent loop script and `SessionStart` hook do not exist yet.
+The Next.js version, router, message transport, storage, and deployment approach will be defined in the design of the first OpenSpec change. Socket.IO and SQLite remain preliminary suggestions. OpenSpec, TypeScript, ESLint, Vitest (with its Vite peer), and Playwright Test are installed as pinned development dependencies. Application dependencies, lint/type-check/test configuration, the agent loop script, and the `SessionStart` hook do not exist yet.
 
 ## Context management
 

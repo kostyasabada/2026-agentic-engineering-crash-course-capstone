@@ -1,0 +1,17 @@
+Node runtime: v24.21.0
+{
+  "name": "chromium",
+  "browser": "153.0.8010.12",
+  "title": "Tooling smoke check",
+  "heading": "Browser ready",
+  "result": "passed"
+}
+{
+  "name": "default-headless-shell",
+  "browser": "153.0.8010.12",
+  "title": "Tooling smoke check",
+  "heading": "Browser ready",
+  "result": "passed"
+}
+
+Exit code: 0

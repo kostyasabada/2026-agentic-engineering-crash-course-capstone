@@ -4,7 +4,7 @@ OpenSpec 1.13.2 uses the existing `spec-driven` schema and project context. Its 
 
 ## Skills and activation
 
-The approved `playwright` and `security-best-practices` skills from `openai/skills` are installed personally at `~/.codex/skills/`, outside this repository. They are available on the next turn; if they do not appear, restart Codex. Playwright provides browser automation guidance and a CLI wrapper; browser binaries and a running browser have not been verified. Security best practices supports explicit security guidance/review requests for Python, JavaScript/TypeScript, and Go. `gh-fix-ci` was not installed.
+The approved `playwright` and `security-best-practices` skills from `openai/skills` are installed personally at `~/.codex/skills/`, outside this repository. They are available on the next turn; if they do not appear, restart Codex. Playwright provides browser automation guidance and a CLI wrapper. The project also installs Playwright Test separately; see `testing.md` for the browser verification result. Security best practices supports explicit security guidance/review requests for Python, JavaScript/TypeScript, and Go. `gh-fix-ci` was not installed.
 
 Start a Codex task with `submissions/kostyasabada/` as its working directory to discover the submission's OpenSpec skills. Repository skill discovery scans from the working directory upward, so a task launched at the course repository root should not be assumed to discover skills in this child directory. In the desktop app, select the skill from the skills UI when available; CLI/IDE users can mention `$openspec-propose`, for example. Installed files and CLI behavior were verified, but runtime discovery and invocation in a new task have not been tested. See [official skill documentation](https://learn.chatgpt.com/docs/build-skills).
 
@@ -23,16 +23,17 @@ The project is also used with Claude Code (user decision). `CLAUDE.md` imports `
 
 ## Commands
 
-Run from `submissions/kostyasabada/`. The version is pinned in the commands; no global installation is needed. The first run requires access to npm.
+Run from `submissions/kostyasabada/`. Install the locked project dependencies with `npm ci`; this requires npm registry access on a clean machine. OpenSpec 1.13.2 is pinned in `package.json` and `package-lock.json`, so no global installation or temporary-cache command is needed.
 
-Generated skills use `openspec ...` as shorthand. In this project, replace that executable with `npx --yes @fission-ai/openspec@1.13.2`, preserving all arguments and the working directory. For the current machine's cached offline installation, use `npm exec --offline --cache /tmp/capstone-npm-cache --yes --package=@fission-ai/openspec@1.13.2 -- openspec ...`.
+Generated skills use `openspec ...` as shorthand. In both Codex and Claude Code, replace that executable with `npm run --silent openspec --`, preserving all arguments and the working directory. The npm script resolves the project-local executable. `--silent` keeps npm's script banner out of JSON output.
 
 ```bash
-npx --yes @fission-ai/openspec@1.13.2 list --json
-npx --yes @fission-ai/openspec@1.13.2 new change <change-name>
-npx --yes @fission-ai/openspec@1.13.2 status --change <change-name> --json
-npx --yes @fission-ai/openspec@1.13.2 instructions proposal --change <change-name> --json
-npx --yes @fission-ai/openspec@1.13.2 validate --all --strict
+npm ci
+npm run --silent openspec -- list --json
+npm run --silent openspec -- new change <change-name>
+npm run --silent openspec -- status --change <change-name> --json
+npm run --silent openspec -- instructions proposal --change <change-name> --json
+npm run --silent openspec -- validate --all --strict
 ```
 
 ## Sequence

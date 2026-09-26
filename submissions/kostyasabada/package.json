@@ -1,0 +1,20 @@
+{
+  "name": "kostyasabada-chat-capstone",
+  "version": "0.0.0",
+  "private": true,
+  "engines": {
+    "node": "^24.0.0",
+    "npm": ">=9"
+  },
+  "scripts": {
+    "openspec": "openspec"
+  },
+  "devDependencies": {
+    "@fission-ai/openspec": "1.13.2",
+    "@playwright/test": "1.63.0",
+    "eslint": "10.11.0",
+    "typescript": "7.0.2",
+    "vite": "8.3.1",
+    "vitest": "5.0.2"
+  }
+}
