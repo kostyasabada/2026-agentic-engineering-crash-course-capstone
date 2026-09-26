@@ -68,3 +68,10 @@ Source: the conversation during initial setup. Product checks have not taken pla
 - Trigger: the coordinator had committed `e66917e` (the `add-realtime-chat-room` OpenSpec change) after checker acceptance without asking the user.
 - Action: added the rule to `../../AGENTS.md` and short cross-references where documents say to commit: `../review-process.md`, `../workflow.md`, `../../openspec/config.yaml`, and task 2.1 in `../../openspec/changes/add-realtime-chat-room/tasks.md`.
 - Source: the user's message on 2026-09-26, relayed by the coordinator. Implementation and actual checks are recorded in `setup-commit-approval/implementation.md` and `setup-commit-approval/checks.txt`; acceptance requires a separate checker report.
+
+## Design proposals decision
+
+- Task: `add-realtime-chat-room-0-1` (decisions gate).
+- User decision (2026-09-26, in Ukrainian, translated: "I accept all, commit the rule"): all design proposals P1–P22 of `add-realtime-chat-room` are accepted as proposed, and open question Q11 is resolved with `better-sqlite3` 13.0.3. The second clause referred to the separate commit of the commit approval rule, not to this task. Open questions Q8, Q10, and Q12 stay open and deferrable.
+- Action: confirmed that the earlier decisions of 2026-09-26 (Q1–Q7, Q9, the Origin and loop simplification principles) are recorded; recorded the decision in `add-realtime-chat-room-0-1/decisions.md`, `../architecture.md`, and `../../openspec/changes/add-realtime-chat-room/design.md`. No approach changed, so specs and tasks were not updated; the proposal received only a one-line wording fix (versions and driver now marked accepted).
+- Source: the user's message on 2026-09-26, relayed by the coordinator. Implementation and actual checks are recorded in `add-realtime-chat-room-0-1/implementation.md` and `add-realtime-chat-room-0-1/checks.txt`; acceptance requires a separate checker report.

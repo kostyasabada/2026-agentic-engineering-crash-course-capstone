@@ -46,7 +46,7 @@ None. `openspec/specs/` has no existing capabilities.
 ## Impact
 
 - New application code under `src/` and a custom server entry `server.ts`; new `scripts/agent-loop.sh`; new `.claude/settings.json`.
-- New runtime dependencies (Next.js, React, Socket.IO server and client, a SQLite driver, zod) and additional development dependencies (Next ESLint config, type packages, a TypeScript runner for `server.ts`). Exact versions and the SQLite driver are proposals in `design.md` pending user confirmation.
+- New runtime dependencies (Next.js, React, Socket.IO server and client, a SQLite driver, zod) and additional development dependencies (Next ESLint config, type packages, a TypeScript runner for `server.ts`). Exact versions and the SQLite driver (`better-sqlite3` 13.0.3) in `design.md` were accepted by the user on 2026-09-26 (task 0.1).
 - The pinned TypeScript 7.0.2 and ESLint 10.11.0 are replaced by TypeScript 6.0.3 and ESLint 9.39.5 (user decision, 2026-09-26) because dependencies of the Next.js ESLint configuration do not support them; the first tooling task changes `package.json` and `package-lock.json`.
 - A local SQLite database file under `data/` (git-ignored) becomes runtime state.
 - `package.json` gains `dev`, `build`, `start`, `lint`, `typecheck`, `test:unit`, `test:e2e`, `test:e2e:dev`, `check`, and `check:loop` scripts; `README.md` and `docs/testing.md` will gain commands once implemented, and `docs/architecture.md` records the accepted decisions.

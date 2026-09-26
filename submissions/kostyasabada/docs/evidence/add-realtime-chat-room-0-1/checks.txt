@@ -1,0 +1,63 @@
+# Checks for add-realtime-chat-room-0-1
+date: 2026-09-26T08:28:44Z
+cwd: submissions/kostyasabada
+
+$ node --version
+v24.21.0
+exit=0
+
+$ npm run --silent openspec -- validate add-realtime-chat-room --strict
+Change 'add-realtime-chat-room' is valid
+exit=0
+
+$ npm run --silent openspec -- validate --all --strict
+- Validating...
+✓ change/add-realtime-chat-room
+Totals: 1 passed, 0 failed (1 items)
+exit=0
+
+$ git diff --check
+exit=0
+
+$ git status --short
+ M docs/architecture.md
+ M docs/evidence/README.md
+ M openspec/changes/add-realtime-chat-room/design.md
+?? docs/evidence/add-realtime-chat-room-0-1/
+exit=0
+
+$ grep -nE '[[:space:]]$' docs/evidence/add-realtime-chat-room-0-1/decisions.md docs/evidence/add-realtime-chat-room-0-1/implementation.md
+exit=1 (1 = no trailing whitespace found)
+
+# Second run after the proposal.md one-line edit (coordinator follow-up)
+date: 2026-09-26T08:29:56Z
+
+$ node --version
+v24.21.0
+exit=0
+
+$ npm run --silent openspec -- validate add-realtime-chat-room --strict
+Change 'add-realtime-chat-room' is valid
+exit=0
+
+$ npm run --silent openspec -- validate --all --strict
+- Validating...
+✓ change/add-realtime-chat-room
+Totals: 1 passed, 0 failed (1 items)
+exit=0
+
+$ git diff --check
+exit=0
+
+$ git status --short
+ M docs/architecture.md
+ M docs/evidence/README.md
+ M openspec/changes/add-realtime-chat-room/design.md
+ M openspec/changes/add-realtime-chat-room/proposal.md
+?? docs/evidence/add-realtime-chat-room-0-1/
+exit=0
+
+$ grep -nE '[[:space:]]$' docs/evidence/add-realtime-chat-room-0-1/decisions.md docs/evidence/add-realtime-chat-room-0-1/implementation.md
+exit=1
+
+exit=1 means no trailing whitespace found

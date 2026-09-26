@@ -1,0 +1,11 @@
+# Snapshot for add-realtime-chat-room-0-1 (revision 2: adds proposal.md)
+base_commit: 57b5517
+paths relative to the repository root; sha256sum output
+
+37b9e6bd8765001b817534b136e862ac3119f338392a8c3b20ab81b39465cd61  submissions/kostyasabada/docs/architecture.md
+204db411870a3206530419649cee118f08f9f31af996fec68e6f9b3aa763ef1e  submissions/kostyasabada/docs/evidence/README.md
+df9940cfeac94d6032a05de7b9f1c5047c9c4a5688bbe3aa39103bb36c70e504  submissions/kostyasabada/openspec/changes/add-realtime-chat-room/design.md
+cd7c996a994584dcb2772c64a64ea5455a486ac6f540c5226c56c2bc60340407  submissions/kostyasabada/openspec/changes/add-realtime-chat-room/proposal.md
+a63122587112446a85fd3375f787bc905b6f52b94cde1c7405b7c88f5c8bd27b  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-0-1/decisions.md
+79c7495d4e8bb4765b5ea8cc7c40ef82b9c257e454e48afd62171dddbbcf10e6  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-0-1/implementation.md
+5232bb9e91e06196b61b3e1cf5a34d09d7e56ef621035f1b3cde89b820b92f1a  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-0-1/checks.txt

@@ -13,7 +13,7 @@ See `proposal.md` (Why, scope, non-goals) and the three delta specs for required
 Every item below carries one label:
 
 - **Accepted (user decision)** — decided by the user; recorded in `docs/architecture.md` and `docs/evidence/README.md`, with the date where the decision was made for this change.
-- **Proposal** — suggested by the coordinator or this maker, pending user confirmation (task 0.1). Not a user decision.
+- **Proposal Pn** — suggested by the coordinator or this maker. All proposals P1–P22 are **Accepted (user decision, 2026-09-26, task 0.1)** as written; the numbering is kept so that references remain valid. The user's reply is recorded in `docs/evidence/add-realtime-chat-room-0-1/decisions.md`.
 - **Open question** — still unanswered; listed with a recommended default in Open Questions. Resolved questions are kept there with their resolution.
 
 ## Goals / Non-Goals
@@ -49,7 +49,7 @@ Every item below carries one label:
 - **Proposal P5:** `socket.io` and `socket.io-client` **4.8.4**. `server.ts` creates one `http.Server`, passes normal requests to Next's request handler, and attaches Socket.IO at the default path `/socket.io/`. Socket.IO is created with `destroyUpgrade: false` so that WebSocket upgrades it does not own (Next.js dev HMR) are not destroyed; non-Socket.IO upgrades are forwarded to Next's upgrade handler.
 - **Proposal P6:** run `server.ts` with `tsx` **4.23.15** in both modes (`dev`: `NODE_ENV=development`, Next dev; `start`: `NODE_ENV=production` after `next build`). Alternative: compile `server.ts` with `tsc` to `dist/` — rejected for now as extra build plumbing for a local-only app. `tsc --noEmit` still type-checks `server.ts`.
 - Environment: `PORT` (default 3000), `HOST` (default `127.0.0.1`), `CHAT_DB_PATH` (default `data/chat.sqlite`). A small config module parses and validates them.
-- **Accepted (user decision, 2026-09-26; review finding N9):** restrict the Socket.IO `Origin` so that a foreign site cannot write to the chat. The user accepted this principle; the mechanism below is a proposal.
+- **Accepted (user decision, 2026-09-26; review finding N9):** restrict the Socket.IO `Origin` so that a foreign site cannot write to the chat. The user accepted this principle; the mechanism below (Proposal P19) was accepted in task 0.1.
 - **Proposal P19 — Host and Origin allowlist mechanism** (review findings N12, B2, N17, N18):
   - **Allowlist construction.** At startup a small module (`src/server/host-policy.ts`) builds the own hosts from `localhost`, `127.0.0.1`, `[::1]`, and the configured `HOST` unless it is a wildcard (`0.0.0.0`, `::`), each combined with `PORT`. Every entry is normalized by parsing it as `new URL("http://" + host + ":" + PORT)` and keeping `.host` (lowercase, default port 80 omitted, IPv6 bracketed); the allowed origins are the matching `.origin` values. Incoming values are normalized the same way before comparison, so `PORT=80` and uppercase host names compare consistently.
   - **Host check for every request.** `server.ts` checks the `Host` header of every HTTP request and every upgrade request before passing it to Next.js or Socket.IO. A missing, unparsable, or non-allowlisted `Host` gets HTTP 403 (upgrades: the socket is answered with 403 and destroyed). This covers all engine.io traffic, including polling requests that carry an existing `sid`, which engine.io's `allowRequest` does not re-check, and it covers the pages themselves.
@@ -263,5 +263,5 @@ Resolved on 2026-09-26 by user decision (the user accepted all recommended defau
 - **Q8 — Codex `SessionStart` parity. Open, deferrable.** Unknown (Codex not installed here). Recommended: evaluate during task 1.5; document the limitation if no verified equivalent exists.
 - **Q9 — Default fixer. Resolved (user decision, 2026-09-26):** `claude -p` by default; `codex exec` selectable, flags unverified; an optional Codex/ChatGPT review pass is extra evidence only when performed, not a gate.
 - **Q10 — Retention. Open, deferrable.** Recommended: keep all rows (no pruning); only the latest 100 are read. Does not change specs.
-- **Q11 — SQLite driver. Open (needs confirmation with proposals P1–P22 in task 0.1).** Recommended: `better-sqlite3` 13.0.3 (Proposal P9), a native dependency.
+- **Q11 — SQLite driver. Resolved (user decision, 2026-09-26, task 0.1):** `better-sqlite3` 13.0.3 (Proposal P9), a native dependency.
 - **Q12 — E2E technique for catch-up while the server stays up. Open, deferrable.** Recommended: try `page.routeWebSocket`; fall back to the Node-level integration test plus restart E2E and record the limitation. Does not change specs.
