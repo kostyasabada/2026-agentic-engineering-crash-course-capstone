@@ -15,7 +15,9 @@
     "typecheck": "tsc --noEmit",
     "test:unit": "vitest run",
     "test:e2e": "next build && playwright test",
-    "test:e2e:dev": "E2E_SERVER_MODE=dev playwright test"
+    "test:e2e:dev": "E2E_SERVER_MODE=dev playwright test",
+    "check": "npm run lint && npm run typecheck && npm run test:unit && npm run test:e2e",
+    "check:loop": "npm run lint && npm run typecheck && npm run test:unit && npm run test:e2e:dev"
   },
   "devDependencies": {
     "@fission-ai/openspec": "1.13.2",
