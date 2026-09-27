@@ -1,0 +1,9 @@
+# Snapshot for add-realtime-chat-room-3-1 (revision 1)
+base_commit: b0714d9
+paths relative to the repository root; sha256sum output; nothing staged or committed; snapshot.txt itself is not part of the snapshot; no review.md yet
+
+5e06126858bd35ffc4fcecd121d09146eefcc823a5641112a3b45f52ad8c6c1d  submissions/kostyasabada/src/server/db/sqlite.ts
+bc83ca9605a88e5a459fe38150fa300cc22b0c291ece68ae2e81f416eb77afb2  submissions/kostyasabada/src/server/chat/message.repository.ts
+03d51abffe576e35f1749f97df7578a23d6ad29090f78fda7119ccd6337eb521  submissions/kostyasabada/src/server/chat/message.repository.test.ts
+b9965c126c808cb20fbfcdddd4a76f93be15840b3fac3e0fbc2d65d6e6a35578  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-3-1/implementation.md
+e7205f7b2f5304cf97b31e6f1481a3a70bc62f2930b12933276d5de499c0057e  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-3-1/checks.txt
