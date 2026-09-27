@@ -1,0 +1,19 @@
+# Snapshot for add-realtime-chat-room-2-1 (revision 4)
+base_commit: 3034b72
+paths relative to the repository root; sha256sum output; nothing staged or committed; snapshot.txt itself and review.md are not part of the snapshot; .agent-loop/ (git-ignored, submissions/kostyasabada/.agent-loop/add-realtime-chat-room-2-1/20260926T185144Z-182994/) is not part of the snapshot
+revision 1 (accepted in review.md round 1): schema.ts 237366d11b036ff640afe663c249f053ab69906f7d3c9ecf2133f5790ae3711f, schema.test.ts 196957c9e0296724afd52371cf49e0e348b455bb91fad712863f3dcc82fb05ea, implementation.md 083e7fcc..., checks.txt 4933a86e...
+revision 2 (not reviewed; superseded): spec.md c3f12bcd..., design.md 278eaefe..., schema.ts 7253a2bf..., schema.test.ts 47f971ee..., implementation.md d5ccd96d..., checks.txt ad5f669f...
+revision 3 (accepted in review.md round 2): spec.md 884e5860..., design.md b24ae144..., schema.ts 4716d78f..., schema.test.ts ad5820f9..., implementation.md 0403c94e..., checks.txt 83d68ee9...
+loop-brief.md and loop-run.log are unchanged since revision 1; schema.ts is unchanged since revision 3
+
+## spec (commit 1: specifications precede code)
+03501f6f2068d2e116e0b93b983eb5960395d4cd52609f5984d45403fe2aa7e7  submissions/kostyasabada/openspec/changes/add-realtime-chat-room/specs/chat-room/spec.md
+32ac45e304af8dabd054a395c678af3d9778429c768ff625e7d55b5bf2e7544d  submissions/kostyasabada/openspec/changes/add-realtime-chat-room/design.md
+
+## code and evidence (commit 2)
+4716d78f88a57fd1f183841cdfc3ca4e32d1e39022dd59ebbcac932e3aabb376  submissions/kostyasabada/src/lib/chat/schema.ts
+a6958501b6dcc1a0a5ab7584db529649651b735b5c1e3dfc00efd25014c4f13c  submissions/kostyasabada/src/lib/chat/schema.test.ts
+2e67d3cae2591f4732706e6041b0e52c3377976242d8a659a1ff30d4075ed353  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-2-1/loop-brief.md
+9e131b91f80693f827ffbc1e458d70c9ffda0063e792dd4c904844a95b52c94e  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-2-1/loop-run.log
+e157ae9801bb9707758f48fb1a040aa5f2627fc345d7075ed84f537d2da17f66  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-2-1/implementation.md
+5280d66f8f8b189fb90978f40ce1e982ac4083e13a9d980a066fc29f8d6972f9  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-2-1/checks.txt
