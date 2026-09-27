@@ -18,7 +18,7 @@ Every length limit in this capability SHALL be measured in UTF-16 code units (th
 - **THEN** the server accepts it on the length rule, as the browser would
 
 ### Requirement: Nickname entry without registration
-The system SHALL require a person to choose a nickname before sending messages, without any account, password, or registration. A valid nickname MUST be 1 to 32 characters long after trimming leading and trailing whitespace and MUST consist only of Unicode letters, Unicode digits, spaces, hyphens (`-`), underscores (`_`), and periods (`.`). The system SHALL store the trimmed nickname, not the raw input. Nicknames are not unique: two people MAY use the same nickname at the same time. The chosen nickname SHALL be remembered in the same browser so that reloading the page does not ask for it again, and the person SHALL be able to change it at any time; messages sent after the change carry the new nickname, and earlier messages keep the nickname they were sent with.
+The system SHALL require a person to choose a nickname before sending messages, without any account, password, or registration. A valid nickname MUST be 1 to 32 characters long after trimming leading and trailing whitespace and MUST consist only of Unicode letters (`\p{L}`), Unicode combining marks (`\p{M}`), Unicode decimal digits of any script (`\p{Nd}`), the space character U+0020, hyphens (`-`), underscores (`_`), and periods (`.`); a combining mark is allowed only as part of a run of one or more combining marks that directly follows a letter (any number of marks may follow a letter), so a mark MUST NOT be the first character of the trimmed nickname and MUST NOT follow a space, hyphen, underscore, period, or digit. Other digit-like characters (for example superscripts or Roman numerals) and whitespace other than U+0020 inside the nickname are not allowed. The system SHALL store the trimmed nickname, not the raw input. Nicknames are not unique: two people MAY use the same nickname at the same time. The chosen nickname SHALL be remembered in the same browser so that reloading the page does not ask for it again, and the person SHALL be able to change it at any time; messages sent after the change carry the new nickname, and earlier messages keep the nickname they were sent with.
 
 #### Scenario: Valid nickname is accepted
 - **WHEN** a person enters `  Alice_1  ` as a nickname and confirms
@@ -35,6 +35,22 @@ The system SHALL require a person to choose a nickname before sending messages, 
 
 #### Scenario: Nickname with disallowed characters is rejected
 - **WHEN** a person confirms the nickname `<script>` or `bob@home`
+- **THEN** the nickname is not accepted and a validation message lists the allowed characters
+
+#### Scenario: Nickname with combining marks is accepted
+- **WHEN** a person confirms the nickname `प्रिया` (Devanagari letters with vowel signs, which are combining marks) or a decomposed `José` (`e` followed by U+0301 COMBINING ACUTE ACCENT)
+- **THEN** the nickname is accepted as entered
+
+#### Scenario: Nickname starting with a combining mark is rejected
+- **WHEN** a person confirms a nickname whose first character after trimming is a combining mark, such as U+0301 followed by `abc`
+- **THEN** the nickname is not accepted and a validation message is shown
+
+#### Scenario: Combining mark after a space or digit is rejected
+- **WHEN** a person confirms the nickname `a`, space, U+0301, `b` (a mark after a space) or `1` followed by U+0301 (a mark after a digit)
+- **THEN** the nickname is not accepted and a validation message is shown
+
+#### Scenario: Nickname with a non-decimal digit is rejected
+- **WHEN** a person confirms the nickname `a²` (superscript two, not a decimal digit)
 - **THEN** the nickname is not accepted and a validation message lists the allowed characters
 
 #### Scenario: Server rejects an invalid nickname sent by a modified client
