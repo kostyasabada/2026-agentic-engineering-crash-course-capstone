@@ -53,6 +53,10 @@ The system SHALL require a person to choose a nickname before sending messages, 
 - **WHEN** a person confirms the nickname `a²` (superscript two, not a decimal digit)
 - **THEN** the nickname is not accepted and a validation message lists the allowed characters
 
+#### Scenario: Nickname with a lone surrogate is rejected by the server
+- **WHEN** a modified client sends a message whose nickname is `a`, U+D800, `b` (a lone surrogate is not a letter, mark, or digit)
+- **THEN** the server rejects it with the error code `invalid_nickname` to that client only, and nothing is stored or broadcast
+
 #### Scenario: Server rejects an invalid nickname sent by a modified client
 - **WHEN** a client bypasses browser validation and sends a message whose nickname violates the nickname rules
 - **THEN** the server does not store or broadcast the message and returns an error to that client only
@@ -95,7 +99,7 @@ The system SHALL deliver every accepted message to all clients connected to the 
 - **THEN** the sender sees an error for that message and the typed text is kept in the input so it can be retried
 
 ### Requirement: Message validation
-The system SHALL trim leading and trailing whitespace from message text and SHALL accept only messages whose trimmed text is 1 to 1000 characters long; line breaks inside the text are preserved. The server MUST enforce these rules independently of the client. A rejected message MUST NOT be stored or broadcast, and the rejection MUST be reported to the sender only.
+The system SHALL trim leading and trailing whitespace from message text and SHALL accept only messages whose trimmed text is 1 to 1000 characters long; line breaks inside the text are preserved. The trimmed text MUST be well-formed UTF-16: text that contains a lone (unpaired) surrogate code unit SHALL be rejected with the error code `invalid_text`, while a valid surrogate pair (such as an emoji) is accepted and counts as two characters. The server MUST enforce these rules independently of the client. A rejected message MUST NOT be stored or broadcast, and the rejection MUST be reported to the sender only.
 
 #### Scenario: Empty message is rejected
 - **WHEN** a person tries to send a message that is empty
@@ -124,6 +128,14 @@ The system SHALL trim leading and trailing whitespace from message text and SHAL
 #### Scenario: Surrounding whitespace is trimmed
 - **WHEN** a person sends `   hi there   `
 - **THEN** every client shows the message text as `hi there`
+
+#### Scenario: Message with a lone surrogate is rejected by the server
+- **WHEN** a modified client sends the message text `a`, U+D800, `b` (a high surrogate without its low surrogate)
+- **THEN** the server rejects it with the error code `invalid_text` to that client only, and nothing is stored or broadcast
+
+#### Scenario: Message with a valid surrogate pair is accepted
+- **WHEN** a person sends `a😀b` (the emoji U+1F600 is a valid surrogate pair)
+- **THEN** the message is stored and delivered to all connected clients with the text unchanged
 
 ### Requirement: Server-assigned ordering and timestamps
 The server SHALL assign each accepted message a unique, increasing identifier and a UTC timestamp at the moment it accepts the message. Clients MUST display messages ordered by that identifier, oldest first, regardless of the order in which they arrive, and MUST NOT show the same message twice. Client-supplied identifiers or timestamps MUST be ignored. Clients SHALL display each timestamp as local time in hours and minutes (`HH:MM`).
