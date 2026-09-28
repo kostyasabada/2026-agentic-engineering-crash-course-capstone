@@ -19,8 +19,9 @@ export const MESSAGE_MAX_LENGTH = 1000
 // that follows a letter), Unicode decimal digits, the space U+0020, hyphen,
 // underscore, and period. Everything else (tabs, line breaks, markup,
 // punctuation, emoji, non-decimal digits, a leading mark, a mark after a
-// non-letter) is rejected. The pattern also matches the empty string so that
-// an empty nickname reports only the "required" issue.
+// non-letter, a lone surrogate, which is \p{Cs}) is rejected. The pattern also
+// matches the empty string so that an empty nickname reports only the
+// "required" issue.
 const NICKNAME_PATTERN = /^(?:\p{L}\p{M}*|[\p{Nd} _.-])*$/u
 
 const NICKNAME_EMPTY_MESSAGE = 'Nickname is required.'
@@ -30,6 +31,8 @@ const NICKNAME_CHARS_MESSAGE =
 
 const MESSAGE_EMPTY_MESSAGE = 'Message is required.'
 const MESSAGE_TOO_LONG_MESSAGE = `Message must be at most ${MESSAGE_MAX_LENGTH} characters.`
+const MESSAGE_MALFORMED_MESSAGE =
+  'Message contains an invalid character (an unpaired UTF-16 surrogate).'
 
 // zod's built-in `.min()`/`.max()` count Unicode code points, so length is
 // checked here against `String.prototype.length` (UTF-16 code units) instead.
@@ -42,12 +45,18 @@ export const nicknameSchema = z
   .refine((value) => value.length <= NICKNAME_MAX_LENGTH, NICKNAME_TOO_LONG_MESSAGE)
   .refine((value) => NICKNAME_PATTERN.test(value), NICKNAME_CHARS_MESSAGE)
 
-/** Message text: trimmed, 1 to 1000 UTF-16 code units, inner content preserved. */
+/**
+ * Message text: trimmed, 1 to 1000 UTF-16 code units, well-formed UTF-16 (no
+ * lone surrogates; a valid surrogate pair counts as two units), inner content
+ * preserved. The empty string is well-formed, so an empty text reports only
+ * the "required" issue.
+ */
 export const messageTextSchema = z
   .string()
   .trim()
   .refine((value) => value.length >= 1, MESSAGE_EMPTY_MESSAGE)
   .refine((value) => value.length <= MESSAGE_MAX_LENGTH, MESSAGE_TOO_LONG_MESSAGE)
+  .refine((value) => value.isWellFormed(), MESSAGE_MALFORMED_MESSAGE)
 
 /**
  * `message:send` payload. Unknown extra fields (client ids, timestamps) are

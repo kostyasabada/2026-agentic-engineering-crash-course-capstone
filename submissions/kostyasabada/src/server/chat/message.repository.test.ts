@@ -114,7 +114,11 @@ describe('SqliteMessageRepository', () => {
   it('records the driver behavior for lone surrogates: replaced by U+FFFD', () => {
     // Observed behavior of better-sqlite3 13.0.3, not a spec rule: strings are
     // converted to UTF-8, and a lone surrogate becomes U+FFFD. insert() returns
-    // the stored row, so the returned and later read texts agree.
+    // the stored row, so the returned and later read texts agree. Since task
+    // 2.2 the shared schema rejects such text upstream (reported to the sender
+    // as `invalid_text`, design D2), so accepted messages never reach the
+    // repository with lone surrogates; this test only records the driver
+    // behavior below that validation.
     const repo = new SqliteMessageRepository(open())
     const stored = repo.insert({ ...message(1), text: 'a\uD800b\uDC00c' })
     expect(stored.text).toBe('a�b�c')

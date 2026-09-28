@@ -136,6 +136,16 @@ describe('nicknameSchema', () => {
     expect(nicknameSchema.safeParse(value).success).toBe(false)
   })
 
+  it.each([
+    ['lone high surrogate', 'a\uD800b'],
+    ['lone low surrogate', 'a\uDC00b'],
+    ['reversed pair (low before high)', 'a\uDC00\uD800b'],
+    ['only a lone surrogate', '\uD800'],
+  ])('rejects a nickname with a lone surrogate: %s', (_label, value) => {
+    expect(value.isWellFormed()).toBe(false)
+    expect(nicknameSchema.safeParse(value).success).toBe(false)
+  })
+
   it('rejects a combining mark that is first after trimming', () => {
     expect(nicknameSchema.safeParse('  \u0301abc  ').success).toBe(false)
   })
@@ -252,6 +262,59 @@ describe('messageTextSchema', () => {
   })
 
   it.each([
+    ['lone high surrogate', 'a\uD800b'],
+    ['lone low surrogate', 'a\uDC00b'],
+    ['reversed pair (low before high)', '\uDC00\uD800'],
+    ['only a lone high surrogate', '\uD800'],
+    ['lone high surrogate at the end after trimming', '  hello\uD800  '],
+    ['lone low surrogate at the start after trimming', '\n\uDC00hello\n'],
+    ['lone surrogate next to a valid pair', '\u{1F600}\uD83D'],
+  ])('rejects text with a lone surrogate: %s', (_label, value) => {
+    expect(value.isWellFormed()).toBe(false)
+    const result = messageTextSchema.safeParse(value)
+    expect(result.success).toBe(false)
+    expect(issueMessages(result).toLowerCase()).toMatch(/surrogate/)
+  })
+
+  it('reports a single issue for a short text with a lone surrogate', () => {
+    const result = messageTextSchema.safeParse('a\uD800b')
+    expect(result.success).toBe(false)
+    expect(result.error?.issues).toHaveLength(1)
+  })
+
+  it('reports both the limit and the surrogate issue for an over-limit text with a lone surrogate', () => {
+    const value = `${'a'.repeat(1000)}\uD800`
+    expect(value.length).toBe(1001)
+    const messages = issueMessages(messageTextSchema.safeParse(value))
+    expect(messages).toMatch(/1000/)
+    expect(messages.toLowerCase()).toMatch(/surrogate/)
+  })
+
+  it('accepts a valid surrogate pair (emoji) unchanged', () => {
+    expect(messageTextSchema.parse('a\u{1F600}b')).toBe('a\u{1F600}b')
+    expect(messageTextSchema.parse('\uD83D\uDE00')).toBe('\u{1F600}')
+  })
+
+  it('counts a valid surrogate pair as two units: 998 + emoji (1000) accepted, 999 + emoji (1001) rejected', () => {
+    const atLimit = `${'a'.repeat(998)}\u{1F600}`
+    expect(atLimit.length).toBe(1000)
+    expect(messageTextSchema.parse(atLimit)).toBe(atLimit)
+    const overLimit = `${'a'.repeat(999)}\u{1F600}`
+    expect(overLimit.length).toBe(1001)
+    const result = messageTextSchema.safeParse(overLimit)
+    expect(result.success).toBe(false)
+    expect(issueMessages(result)).toMatch(/1000/)
+    expect(issueMessages(result).toLowerCase()).not.toMatch(/surrogate/)
+  })
+
+  it('still reports only the empty issue for whitespace-only text', () => {
+    const result = messageTextSchema.safeParse(' \t\n ')
+    expect(result.success).toBe(false)
+    expect(result.error?.issues).toHaveLength(1)
+    expect(issueMessages(result).toLowerCase()).not.toMatch(/surrogate/)
+  })
+
+  it.each([
     ['number', 42],
     ['null', null],
     ['undefined', undefined],
@@ -291,6 +354,18 @@ describe('sendMessageSchema', () => {
     const result = sendMessageSchema.safeParse({ nickname: 'Sam', text: '   ' })
     expect(result.success).toBe(false)
     expect(result.error?.issues.map((issue) => issue.path[0])).toEqual(['text'])
+  })
+
+  it('reports a text with a lone surrogate under the text path only', () => {
+    const result = sendMessageSchema.safeParse({ nickname: 'Sam', text: 'a\uD800b' })
+    expect(result.success).toBe(false)
+    expect(result.error?.issues.map((issue) => issue.path[0])).toEqual(['text'])
+  })
+
+  it('reports a nickname with a lone surrogate under the nickname path only', () => {
+    const result = sendMessageSchema.safeParse({ nickname: 'a\uD800b', text: 'hello' })
+    expect(result.success).toBe(false)
+    expect(result.error?.issues.map((issue) => issue.path[0])).toEqual(['nickname'])
   })
 
   it('rejects a payload with missing fields', () => {

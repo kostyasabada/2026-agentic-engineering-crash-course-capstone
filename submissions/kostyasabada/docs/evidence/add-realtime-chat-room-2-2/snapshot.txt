@@ -1,0 +1,16 @@
+# Snapshot for add-realtime-chat-room-2-2 (revision 1)
+base_commit: 785bece
+paths relative to the repository root; sha256sum output; nothing staged or committed; snapshot.txt itself is not part of the snapshot; no review.md yet
+
+## group "spec" (first commit)
+62b576a216ee62a2a1ff05e6b6cbb56832c3c595860180def1f051779c899409  submissions/kostyasabada/openspec/changes/add-realtime-chat-room/tasks.md
+ff5ad81264fd71e4d55cecab565dafdac9fbbfcc0eaa2eed11624202980ed849  submissions/kostyasabada/openspec/changes/add-realtime-chat-room/specs/chat-room/spec.md
+538ae592fa37f1e68deafe3ae52c2254f92105a5ff371a16083de89afce93278  submissions/kostyasabada/openspec/changes/add-realtime-chat-room/design.md
+
+## group "code and evidence" (second commit)
+058aac9df0bb873df1b6a62d89ebd97b080b8ec6bff5c3617cd01837e9a1f768  submissions/kostyasabada/src/lib/chat/schema.ts
+56f0a96ba705d59c6f42168b9e611bd6fa338b8c18100bcebca5f101c952037d  submissions/kostyasabada/src/lib/chat/schema.test.ts
+67b2579335804d29c4d0c9705204c3dedc954ac84bfcfeded1e17380a47a1f27  submissions/kostyasabada/src/server/chat/message.repository.test.ts
+35d8b40fc1ce47c6efca098279c1794916fdc174a2993fcfe94e2d6d770ec6b4  submissions/kostyasabada/docs/testing.md
+b1d14a0ea9ad55ce7d31a29b453c05ded78e7ed8404c7f883620aaca705f9e48  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-2-2/implementation.md
+2dd8d0da8cc5be846fb275f7656573acbeff643859560f69b68f71a234d7e64e  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-2-2/checks.txt
