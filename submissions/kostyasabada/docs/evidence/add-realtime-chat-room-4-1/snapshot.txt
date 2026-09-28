@@ -1,0 +1,14 @@
+# Snapshot for add-realtime-chat-room-4-1 (revision 2)
+base_commit: e9cf4ed
+paths relative to the repository root; sha256sum output; nothing staged or committed; snapshot.txt itself is not part of the snapshot; review.md (checker-owned, round 1) is not part of the snapshot
+revision 1 hashes (superseded): chat.controller.ts fbdf9313..., chat.controller.test.ts c7f9abff..., host-policy.ts 4bedac3a..., host-policy.test.ts 977bec13...
+
+## Deliverables
+77df3db77de86a4f698fd0b246adac43516004c713cedda0e94dee872a30e589  submissions/kostyasabada/src/server/chat/chat.controller.ts
+1af51a98445fad4c68472cd0f05a4784d2e388ba9fbc1132ff5da7cdf1c56d3d  submissions/kostyasabada/src/server/chat/chat.controller.test.ts
+8fb8749c19ea0990a776f6be5ef96cbf61a91eec7f46c7744d11283eee699ae9  submissions/kostyasabada/src/server/http/host-policy.ts
+c3ff6536b4b2a6a5a08ecb7774436b6dc27b7b4e3308c9183849f4af463655a3  submissions/kostyasabada/src/server/http/host-policy.test.ts
+
+## Evidence reports (listed separately)
+17e30467d0b6b56e86855eb110f375282a4ac0c84a770d54dac018446f8c7c39  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-4-1/implementation.md
+(checks.txt: append-only log; its final entry, the round-2 whitespace check, is written after this snapshot, so its hash is not included here; the maker reports the final hash separately)
