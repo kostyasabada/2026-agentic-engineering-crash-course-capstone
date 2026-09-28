@@ -1,0 +1,15 @@
+# Snapshot for add-realtime-chat-room-4-2 (revision 2)
+base_commit: 02b645a
+paths relative to the repository root; sha256sum output; nothing staged or committed; snapshot.txt itself is not part of the snapshot; review.md (checker-owned, round 1) is not part of the snapshot
+revision 1 hashes (superseded or unchanged): server.ts af6c6e28... (unchanged), app.ts ad4cd1e8..., app.test.ts d3e00883..., host-policy.spec.ts 7ebcc58a... (unchanged), shutdown.spec.ts f7af4947...
+
+## Deliverables
+af6c6e280a1067237a2d1ccc896ae62fd00833e9b3caa58f07991f9d1fe026b5  submissions/kostyasabada/server.ts
+9845371c3c96a51223983b9edd255da7ea16966c99a37483c7d812d46ec5e36d  submissions/kostyasabada/src/server/app.ts
+0f086ddbe12a72b9704a29b16940bed7a7537a227ace2e14aa5d20291300741a  submissions/kostyasabada/src/server/app.test.ts
+7ebcc58a4a741898e72888b34bf9bf00ce3bbc54075f72dc04e998deaca96efa  submissions/kostyasabada/e2e/host-policy.spec.ts
+88c5db2280dc5cb154cff7ce7aadfe514e4b7ab55f745134f155e7add27520d7  submissions/kostyasabada/e2e/shutdown.spec.ts
+
+## Evidence reports (listed separately)
+e4dfa0727ccd42f0d4fbe6eb484ec9356bec43b6c17ccc9577f890cb34896145  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-4-2/implementation.md
+(checks.txt: append-only log; its final entries, the round-2 whitespace and hash checks, are written after this snapshot, so its hash is not included here; the maker reports the final hash separately)
