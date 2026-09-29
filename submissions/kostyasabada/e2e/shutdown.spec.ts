@@ -9,7 +9,7 @@ import { SqliteMessageRepository } from '../src/server/chat/message.repository'
 import { closeDatabase, openDatabase } from '../src/server/db/sqlite'
 import { freePort, serverMode, spawnServerProcess } from './fixtures/chat-server'
 
-// Graceful shutdown of the real entry (task 4.2, design D4): `tsx server.ts` is spawned
+// Graceful shutdown of the real entry (task 4.2, design D4): `node --import tsx server.ts` is spawned
 // in its own process group as the fixture does, a message is stored through Socket.IO,
 // and the signal is sent to the group (as the fixture's stop() and a terminal's Ctrl+C
 // do). The process must exit by itself with code 0 after closing Socket.IO and the
@@ -164,7 +164,7 @@ for (const signal of ['SIGTERM', 'SIGINT'] as const) {
         closeDatabase(db)
       }
     } finally {
-      // Never leave the server (or its tsx child) running.
+      // Never leave the server (or any process of its group) running.
       killOnExit()
       process.off('exit', killOnExit)
       await rm(dir, { recursive: true, force: true })

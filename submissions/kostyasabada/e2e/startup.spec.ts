@@ -31,7 +31,7 @@ test('the server exits with code 1 when its port is already in use', async () =>
       new Promise<'still running'>((resolve) => setTimeout(() => resolve('still running'), EXIT_WAIT_MS)),
     ])
   } finally {
-    // Never leave the server (or its tsx child) running.
+    // Never leave the server (or any process of its group) running.
     try {
       if (server.pid !== undefined) process.kill(-server.pid, 'SIGKILL')
     } catch {

@@ -23,7 +23,7 @@ Restricted agent sandboxes may block Chromium's socket operations; run E2E tests
 | `npm run test:e2e:dev` | Playwright against a development-mode server, without a build. |
 | `npm run lint` / `npm run typecheck` | ESLint (including the layer-boundary import rules) / `tsc --noEmit`. |
 
-Every stage runs real checks; none passes with zero tests. The E2E fixture `e2e/fixtures/chat-server.ts` starts its own `tsx server.ts` for each test on a free port with a temporary database path, so no server needs to be running beforehand. Playwright writes `test-results/` and `playwright-report/` (git-ignored). `next build` and `next dev` write separate parts of `.next/`, so `test:e2e` and `test:e2e:dev` can run in either order (task 1.3 evidence).
+Every stage runs real checks; none passes with zero tests. The E2E fixture `e2e/fixtures/chat-server.ts` starts its own `node --import tsx server.ts` (the same Node binary as Playwright, in its own process group, so signals reach the server's shutdown handler directly; task 4.3) for each test on a free port with a temporary database path, so no server needs to be running beforehand. Playwright writes `test-results/` and `playwright-report/` (git-ignored). `next build` and `next dev` write separate parts of `.next/`, so `test:e2e` and `test:e2e:dev` can run in either order (task 1.3 evidence).
 
 Agent-driven browser checks and screenshots (for example, the Codex `playwright` skill or the Claude Code browser) are supplementary manual checks, not a substitute for the automated tests.
 

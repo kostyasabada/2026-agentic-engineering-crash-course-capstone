@@ -1,0 +1,22 @@
+# Snapshot for add-realtime-chat-room-4-3 (revision 2)
+base_commit: 460fbe7
+paths relative to the repository root; sha256sum output; nothing staged or committed; snapshot.txt itself is not part of the snapshot
+revision 2 changes only README.md (review findings C1, C2) and the evidence reports; every other hash equals revision 1
+
+## Group "spec" (first commit)
+c626bbe41e0f7bcc415da7e4f1a5c1d86d04453fd70691e12b265bd44ddaebef  submissions/kostyasabada/openspec/changes/add-realtime-chat-room/tasks.md
+c3020358960506b53b9ed3b9dde8a9822d12b5c78467103584f2b7dcc57bc214  submissions/kostyasabada/openspec/changes/add-realtime-chat-room/design.md
+(specs/*/spec.md unchanged: no delta spec mentions the runner)
+
+## Group "code and evidence" (second commit)
+592ececc132e7facd998b4fe973f6dc46e905f98a8f81af8e87c06908a514127  submissions/kostyasabada/package.json
+b1ec7036c90195ef749af04b658a2966687556244ae90ebf91d9884763de7e06  submissions/kostyasabada/e2e/fixtures/chat-server.ts
+2e239c6554a9fd6daf7eeb1fdf2d49fa906ac89850132111a7ffc01e9846cb07  submissions/kostyasabada/e2e/shutdown.spec.ts
+476dd66e7f22106272924e7c4614fb7797be233b6802163fb01673241c2342cd  submissions/kostyasabada/e2e/startup.spec.ts
+6a403f5ddb65d2d38125e7b1ec5ae95b3b1b966b06c58431555b5537567e6303  submissions/kostyasabada/docs/testing.md
+37ab96310a43f5e97310295becade1d446d5a080e2a49e5f4fb3435612ef52bc  submissions/kostyasabada/README.md
+
+## Evidence reports (listed separately, part of the second commit)
+e6784b1ae3cc3a04c09ebeddd846b449c4d3621cc35902ed4b33009cb704821d  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-4-3/implementation.md
+(review.md: written by the checker, not part of the maker snapshot)
+(checks.txt: append-only log; its final entries, the whitespace checks and the final process check, are written after this snapshot, so its hash is not included here; the maker reports the final hash separately)

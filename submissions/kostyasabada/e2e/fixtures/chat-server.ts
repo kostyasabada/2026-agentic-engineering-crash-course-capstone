@@ -6,7 +6,7 @@ import path from 'node:path'
 import { test as base } from '@playwright/test'
 
 /**
- * Per-test custom server (design D6): spawns `tsx server.ts` on a free port with a
+ * Per-test custom server (design D6): spawns `node --import tsx server.ts` on a free port with a
  * fresh temporary CHAT_DB_PATH. E2E_SERVER_MODE=prod (default) runs NODE_ENV=production
  * and needs a prior `next build`; E2E_SERVER_MODE=dev runs NODE_ENV=development.
  */
@@ -21,7 +21,6 @@ export interface ChatServer {
 }
 
 const PROJECT_DIR = path.resolve(__dirname, '../..')
-const TSX_CLI = require.resolve('tsx/cli')
 const STARTUP_TIMEOUT_MS = 60_000
 const STOP_TIMEOUT_MS = 5_000
 const READY_REQUEST_TIMEOUT_MS = 5_000
@@ -50,11 +49,14 @@ async function groupExited(group: number, timeoutMs: number): Promise<boolean> {
 }
 
 /**
- * Spawns `tsx server.ts` in its own process group (so that stop() can signal the tsx CLI
- * and the real server.ts process together; a SIGKILL cannot be relayed by the CLI).
+ * Spawns `node --import tsx server.ts` in its own process group (design P6, task 4.3): one
+ * Node process with the tsx loader, so a signal reaches the handler in server.ts directly
+ * (the tsx CLI would relay it to a child and SIGKILL that child if it did not report the
+ * signal within about 30 ms). stop() signals the whole group, including any helper
+ * processes Next.js starts.
  */
 export function spawnServerProcess(port: number, dbPath: string, mode: 'prod' | 'dev'): ChildProcess {
-  return spawn(process.execPath, [TSX_CLI, 'server.ts'], {
+  return spawn(process.execPath, ['--import', 'tsx', 'server.ts'], {
     cwd: PROJECT_DIR,
     env: {
       ...process.env,
