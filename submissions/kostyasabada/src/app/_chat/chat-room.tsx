@@ -2,7 +2,10 @@
 
 import { useState, useSyncExternalStore } from 'react'
 import { nicknameSchema } from '../../lib/chat/schema'
+import { Composer } from './composer'
+import { MessageList } from './message-list'
 import { NicknameForm } from './nickname-form'
+import { useChatSocket } from './use-chat-socket'
 
 // The chosen nickname is kept in localStorage under this key (design Q1).
 const STORAGE_KEY = 'chat.nickname'
@@ -56,6 +59,8 @@ const getServerNickname = (): string | null | undefined => undefined
 export function ChatRoom() {
   const nickname = useSyncExternalStore<string | null | undefined>(subscribe, readNickname, getServerNickname)
   const [editing, setEditing] = useState(false)
+  // One socket per ChatRoom, connected in the browser only (see use-chat-socket.ts).
+  const chat = useChatSocket()
 
   if (nickname === undefined) {
     return <p className="chat-room__loading">Loading…</p>
@@ -94,6 +99,8 @@ export function ChatRoom() {
           </button>
         </div>
       )}
+      <MessageList messages={chat.messages} />
+      <Composer nickname={nickname} connected={chat.connected} onSend={chat.send} />
     </section>
   )
 }

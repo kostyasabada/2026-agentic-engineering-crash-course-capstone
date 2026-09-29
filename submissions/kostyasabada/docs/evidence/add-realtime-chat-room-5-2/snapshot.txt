@@ -1,0 +1,17 @@
+# Snapshot for add-realtime-chat-room-5-2 (revision 1)
+base_commit: 33e0900
+paths relative to the repository root; sha256sum output; nothing staged or committed; snapshot.txt itself is not part of the snapshot
+
+## Deliverables
+096e0e2b47f6972755bd5bd2a997cf26aac9eee5a425e440466756a56a68dc04  submissions/kostyasabada/src/app/_chat/merge-messages.ts
+9b56c9fe437b5bd1ab4c6697e78b66bf0bee15c64f0763e6e2bbe501faad7418  submissions/kostyasabada/src/app/_chat/merge-messages.test.ts
+fb3ce3729f9c2c7cdaefe44ac87de7c5ba69f3752dd0595ba4d57740ff1e6d7f  submissions/kostyasabada/src/app/_chat/use-chat-socket.ts
+eed817510fbb6868e3a437621637074977b3717a3f553a9c461a5473b73d6f19  submissions/kostyasabada/src/app/_chat/message-list.tsx
+3bcc5fe8c83df410df550c54817cf9a57e9770e4000b3b08698cd59415988b3a  submissions/kostyasabada/src/app/_chat/composer.tsx
+c81000d1ffafb7dea5d0ecc66caa410458dbb0bf32cb4a29d8211f3eefdeb6c5  submissions/kostyasabada/src/app/_chat/chat-room.tsx
+308591d8c50d4b14168259a4da7caeaa927e0b2edd553c34136d04d6bf255d5f  submissions/kostyasabada/src/app/globals.css
+54ea5865cae46e35be91c8ffec1677075998eb9cf5018af563e734822cd331ae  submissions/kostyasabada/e2e/messaging.spec.ts
+
+## Supplementary screenshots
+9752147f577a078446d5c48925dc5b13bd979499aea5975e2c1e6dd5063ab6c1  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-5-2/two-contexts-side-by-side.png
+55a53eba0161a441726368d8b601a221ec211d469f0e3386542fd9f2bbda79d1  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-5-2/composer-limit-message.png

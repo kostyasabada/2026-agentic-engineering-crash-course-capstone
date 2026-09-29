@@ -65,3 +65,71 @@ button {
   margin: 0;
   overflow-wrap: anywhere;
 }
+
+textarea {
+  font: inherit;
+  padding: 0.35rem 0.6rem;
+}
+
+.message-list {
+  list-style: none;
+  margin: 1rem 0;
+  padding: 0;
+}
+
+.message {
+  padding: 0.35rem 0;
+}
+
+.message__meta,
+.message__text {
+  margin: 0;
+}
+
+.message__author {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.message__meta time {
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+/* Plain text with its line breaks (design Q6). */
+.message__text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.composer label {
+  display: block;
+  font-weight: 600;
+}
+
+.composer__row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-end;
+}
+
+.composer__row textarea {
+  flex: 1 1 auto;
+  min-width: 0;
+  resize: vertical;
+}
+
+.composer__count {
+  margin: 0.25rem 0 0;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.composer__error {
+  color: var(--error);
+}
+
+.composer__error p,
+p.composer__error {
+  margin: 0.25rem 0 0;
+}
