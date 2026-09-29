@@ -1,0 +1,21 @@
+# Snapshot for add-realtime-chat-room-5-1 (revision 1)
+base_commit: 67ed23e
+paths relative to the repository root; sha256sum output; nothing staged or committed; snapshot.txt itself is not part of the snapshot
+
+## Deliverables
+da670c476c4dc380cbef4d6d7bf1c8e3f0db1ac230c573f3e4fd65303f8921cc  submissions/kostyasabada/src/app/page.tsx
+8ffa365436d068c91d0b71f0331fbe9d381d15d53a2efab5796c8382b97c9c3f  submissions/kostyasabada/src/app/layout.tsx
+3ec371e0b8f27b9508623cb72a2a833bd73598c9066f055259af68fab0b9865b  submissions/kostyasabada/src/app/globals.css
+5ffbc0c83c528d5b4d96bfe6d6f893c3199b86ba0e6a1659777d7fdf0ed440df  submissions/kostyasabada/src/app/_chat/chat-room.tsx
+ac07a078c34327ac5d008135b962714927291352b54c4a9d863605dc05f8f79f  submissions/kostyasabada/src/app/_chat/nickname-form.tsx
+59e214c18c2097a1e9f5740daff5c84f927f97f8b1321b7cf7abbf8d641fba22  submissions/kostyasabada/e2e/nickname.spec.ts
+
+## Supplementary screenshots
+0cdc86ef41830a252160681bf4544fe18a636f839f184481218c17f81c86899d  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-5-1/nickname-accepted.png
+7e2f73681c8fbfa64687f4dc326b1970266d14cb66f88f7da8918354bddb2241  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-5-1/nickname-form-error-characters.png
+1fe0b4f50ec83563e6bea9615a580fa7aa0b59a0972fab6d1ed10f58d7073a4f  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-5-1/nickname-form-error-too-long.png
+3afc5369484bf439c9a5dab233c761f7c2d13a38dd7cded7d0d66d3204d05987  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-5-1/nickname-form-valid.png
+
+## Evidence reports (listed separately)
+92f4c577a972591bff7e00ed101658d23d83201ff079ef97180079dbddb3cb57  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-5-1/implementation.md
+(checks.txt: append-only log; its final entries, the whitespace checks of the evidence files and the final process check, are written after this snapshot, so its hash is not included here; the maker reports the final hash separately)

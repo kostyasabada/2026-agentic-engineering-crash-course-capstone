@@ -1,0 +1,67 @@
+:root {
+  color-scheme: light dark;
+  --error: #b3261e;
+  --muted: #5f6368;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --error: #f2b8b5;
+    --muted: #a8adb3;
+  }
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+}
+
+main {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+input,
+button {
+  font: inherit;
+  padding: 0.35rem 0.6rem;
+}
+
+.nickname-form label {
+  display: block;
+  font-weight: 600;
+}
+
+.nickname-form__row,
+.chat-room__identity {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.nickname-form__row input {
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+
+.nickname-form__count {
+  margin: 0.25rem 0 0;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.nickname-form__error {
+  color: var(--error);
+}
+
+.nickname-form__error p {
+  margin: 0.25rem 0 0;
+}
+
+.chat-room__identity p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
