@@ -23,6 +23,8 @@ export type ChatSocket = {
   messages: ChatMessage[]
   /** Whether a `history` event has arrived since the page loaded (the room's state is known). */
   historyLoaded: boolean
+  /** Server id of the person's latest message accepted by the server in this page (from its ack), if any. */
+  ownAcceptedId: number | undefined
   /** The current connection status. */
   status: ConnectionStatus
   /** Whether the socket is connected (`status === 'Connected'`); sending is possible only then. */
@@ -39,7 +41,8 @@ const TIMED_OUT = `Message not sent: the server did not confirm it within ${SEND
  * effect, so nothing runs during server rendering, and it is closed on unmount.
  * - `history` (`replace` / `append`) and `message:new` are merged by id (merge-messages.ts);
  *   an accepted send's ack message is merged too, so the sender's own message is shown
- *   once even if the broadcast and the ack both arrive.
+ *   once even if the broadcast and the ack both arrive. The accepted message's id is
+ *   exposed as `ownAcceptedId`, so the list can scroll to it (design Q4, task 5.5).
  * - The handshake `auth` is a function, so every reconnection sends the current highest
  *   id as `lastSeenId` and receives only the missed messages.
  * - Status (design D2): `connect` → `Connected`. On `disconnect`, `socket.active` tells
@@ -60,6 +63,7 @@ const TIMED_OUT = `Message not sent: the server did not confirm it within ${SEND
 export function useChatSocket(): ChatSocket {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [historyLoaded, setHistoryLoaded] = useState(false)
+  const [ownAcceptedId, setOwnAcceptedId] = useState<number | undefined>(undefined)
   const [status, setStatus] = useState<ConnectionStatus>('Disconnected')
   const socketRef = useRef<Socket | null>(null)
   const lastSeenIdRef = useRef<number | undefined>(undefined)
@@ -115,8 +119,10 @@ export function useChatSocket(): ChatSocket {
     const ack = readSendAck(rawAck)
     if (!ack.ok) return ack
     setMessages((current) => mergeMessages(current, [ack.message]))
+    // Only an accepted send reaches this point; the message list scrolls to it (design Q4).
+    setOwnAcceptedId(ack.message.id)
     return { ok: true }
   }, [])
 
-  return { messages, historyLoaded, status, connected: status === 'Connected', send }
+  return { messages, historyLoaded, ownAcceptedId, status, connected: status === 'Connected', send }
 }

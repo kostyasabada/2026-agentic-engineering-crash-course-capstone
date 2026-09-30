@@ -23,6 +23,11 @@ type MessageListProps = {
   messages: readonly ChatMessage[]
   /** Whether the first `history` event has arrived; the empty-room hint is shown only then. */
   historyLoaded: boolean
+  /**
+   * Server id of the person's latest accepted own message (use-chat-socket.ts). Each new
+   * value scrolls the list to the bottom, even if the person had scrolled up.
+   */
+  ownAcceptedId?: number
 }
 
 /**
@@ -36,12 +41,15 @@ type MessageListProps = {
  * newest message is at the bottom. After every change of the messages (the history on
  * join, a new message, a catch-up) the list is scrolled to the bottom if it was at the
  * bottom before the change (`atBottomRef`, updated by the person's scrolling); otherwise its
- * scroll position is left where the person put it. This applies to the person's own sent
- * messages too. A new list (first render, or after the room was empty) starts at the bottom.
+ * scroll position is left where the person put it. Exception (design Q4, task 5.5): when the
+ * server has accepted a message the person sent (a new `ownAcceptedId`), the list is scrolled
+ * to the bottom even if the person had scrolled up; a failed send changes nothing. A new list
+ * (first render, or after the room was empty) starts at the bottom.
  */
-export function MessageList({ messages, historyLoaded }: MessageListProps) {
+export function MessageList({ messages, historyLoaded, ownAcceptedId }: MessageListProps) {
   const listRef = useRef<HTMLOListElement>(null)
   const atBottomRef = useRef(true)
+  const scrolledForOwnIdRef = useRef<number | undefined>(undefined)
 
   // Runs after the DOM update and before the browser paints, so the new content is never
   // shown at the old position first.
@@ -51,8 +59,12 @@ export function MessageList({ messages, historyLoaded }: MessageListProps) {
       atBottomRef.current = true
       return
     }
+    if (ownAcceptedId !== scrolledForOwnIdRef.current) {
+      scrolledForOwnIdRef.current = ownAcceptedId
+      atBottomRef.current = true
+    }
     if (atBottomRef.current) list.scrollTop = list.scrollHeight
-  }, [messages])
+  }, [messages, ownAcceptedId])
 
   function handleScroll(event: UIEvent<HTMLOListElement>) {
     const list = event.currentTarget

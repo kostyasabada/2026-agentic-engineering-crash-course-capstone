@@ -1,0 +1,23 @@
+# Snapshot for add-realtime-chat-room-5-5 (revision 2)
+base_commit: 393e3d2
+paths relative to the repository root; sha256sum output; nothing staged or committed; implementation.md, review.md, and checks.txt are evidence reports (their hashes are below; the final checks.txt hash is stated at the end, not inside checks.txt itself)
+revision 2 vs. revision 1: only e2e/history.spec.ts changed among the deliverables (was 9774ac1f4ac2ba54ba00c4ff8f6f4812deb45d7b8aba11a6006188c52dd63f67)
+
+## Group "spec" (first commit)
+66d8eeccd9e46c49956b7a1ff1fe43f608cbd3a55179798c4776ab5dde7dc673  submissions/kostyasabada/openspec/changes/add-realtime-chat-room/tasks.md
+7668da6246ac4f36cbdc745e88ae3a807b9c4f1f3940bdea9e6a7451e6bdf7dc  submissions/kostyasabada/openspec/changes/add-realtime-chat-room/specs/chat-room/spec.md
+9d36081ba9f342b5b2b950685f3d5c8ba74104873f0d07a4978df111d73ea383  submissions/kostyasabada/openspec/changes/add-realtime-chat-room/design.md
+
+## Group "code and evidence" (second commit) — deliverables
+bb7822de289b7de601c90a6cbe3894c5c9e444de6a654cb3b0ea32adbec54db9  submissions/kostyasabada/e2e/history.spec.ts
+7895d4a440a8923e74014e6f091b3cec40f0bddf61ff9946317ea0142b8a04ac  submissions/kostyasabada/src/app/_chat/use-chat-socket.ts
+d6391d6560d736efd50096aeb006580512b937b5bd8e17c299d74c077488f093  submissions/kostyasabada/src/app/_chat/message-list.tsx
+253e32d69b658bf7ea1ece018ad5be5bdf3c9d945ffead119affe1b2c4efbd47  submissions/kostyasabada/src/app/_chat/chat-room.tsx
+
+## Group "code and evidence" — evidence reports (not hashed deliverables)
+addc692cd7bf0692e134e0bcc20a4f1925b9b86a910875ebcd8946e9985719d9  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-5-5/implementation.md
+5ece2e004260dfaab75d292d866cd2385d3a032ac37b08e21888ad8ead2c90fc  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-5-5/review.md
+(review.md is the checker's report, not edited by the maker)
+
+## Evidence log
+checks.txt (final; not re-hashed inside itself): fdc8bc562d2512ec30bdf734254f0862e083fbc98d9cc409f93b9bd3fdfc6c1e  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-5-5/checks.txt

@@ -125,6 +125,29 @@ async function nextFrames(page: Page): Promise<void> {
 }
 
 /**
+ * Scrolls the list up to a middle position and waits until the scroll event was handled
+ * (resolves at once, without a scroll event, if the position did not change, e.g. because
+ * the list does not scroll; the assertion then fails). Returns the metrics afterwards; the
+ * list is then more than 100 px from the bottom.
+ */
+async function scrollUpToMiddle(page: Page): Promise<ScrollMetrics> {
+  const target = await messageList(page).evaluate(
+    (list) =>
+      new Promise<number>((resolve) => {
+        const start = list.scrollTop
+        list.addEventListener('scroll', () => resolve(list.scrollTop), { once: true })
+        list.scrollTop = Math.floor((list.scrollHeight - list.clientHeight) / 2)
+        if (list.scrollTop === start) resolve(start)
+      }),
+  )
+  expect(target).toBeGreaterThan(0)
+  await nextFrames(page)
+  const metrics = await scrollMetrics(page)
+  expect(distanceFromBottom(metrics)).toBeGreaterThan(100)
+  return metrics
+}
+
+/**
  * Records every `history` event the page receives (copied from connection.spec.ts): the
  * first connection uses HTTP long-polling, so the `history` packet arrives in a polling
  * response; packets are separated by U+001E, and an event packet is `42["event",data]`.
@@ -148,6 +171,29 @@ function recordHistory(page: Page): History[] {
     }
   })
   return received
+}
+
+/**
+ * Routes the page's Socket.IO WebSocket through the test (copied from messaging.spec.ts):
+ * `onSend` decides what happens to each `message:send` packet the page sends after the
+ * transport upgrade: forward it (possibly changed) to the server, or drop it (undefined).
+ */
+async function routeSends(page: Page, onSend: (packet: string) => string | undefined): Promise<() => boolean> {
+  let upgraded = false
+  await page.routeWebSocket(/\/socket\.io\//, (ws) => {
+    const server = ws.connectToServer()
+    ws.onMessage((message) => {
+      if (message === '5') upgraded = true // engine.io "upgrade" packet: later packets use this WebSocket
+      if (typeof message === 'string' && /^42\d+\["message:send"/.test(message)) {
+        const forwarded = onSend(message)
+        if (forwarded !== undefined) server.send(forwarded)
+        return
+      }
+      server.send(message)
+    })
+    server.onMessage((message) => ws.send(message))
+  })
+  return () => upgraded
 }
 
 /** Opens the chat page in a new, independent browser context (UTC, fixed viewport). */
@@ -298,22 +344,8 @@ test('a new message from another client does not move the view when the person h
   await expect.poll(() => atBottom(a)).toBe(true)
   const b = await openChat(browser, baseURL!, 'B', 'Bob')
 
-  // Scroll up to a middle position of the list and wait until the scroll event was handled
-  // (resolves at once, without a scroll event, if the position did not change, e.g. because
-  // the list does not scroll; the next assertion then fails).
-  const target = await messageList(a).evaluate(
-    (list) =>
-      new Promise<number>((resolve) => {
-        const start = list.scrollTop
-        list.addEventListener('scroll', () => resolve(list.scrollTop), { once: true })
-        list.scrollTop = Math.floor((list.scrollHeight - list.clientHeight) / 2)
-        if (list.scrollTop === start) resolve(start)
-      }),
-  )
-  expect(target).toBeGreaterThan(0)
-  await nextFrames(a)
-  const before = await scrollMetrics(a)
-  expect(distanceFromBottom(before)).toBeGreaterThan(100)
+  // Scroll up to a middle position of the list (more than 100 px from the bottom).
+  const before = await scrollUpToMiddle(a)
 
   await send(b, 'while A reads older messages')
   // The new message has been rendered in A's list, then the view is where A left it.
@@ -325,7 +357,6 @@ test('a new message from another client does not move the view when the person h
   expect(after.scrollHeight).toBeGreaterThan(before.scrollHeight)
   expect(await visibleWithoutScrolling(a, 'while A reads older messages')).toBe(false)
 
-
   // Scrolled all the way up with the keyboard (Home): a further message does not move it either.
   await messageList(a).focus()
   await a.keyboard.press('Home')
@@ -335,6 +366,75 @@ test('a new message from another client does not move the view when the person h
   await expect(messageText(a, 'second while A reads')).toHaveCount(1)
   await nextFrames(a)
   expect((await scrollMetrics(a)).scrollTop).toBe(0)
+})
+
+test("the person's own message scrolls into view once the server accepts it, even when they have scrolled up", async ({
+  browser,
+  baseURL,
+  chatServer,
+}) => {
+  await seed(chatServer, numbered(105))
+  const a = await openChat(browser, baseURL!, 'A', 'Alice')
+  await expectMessages(a, shownRange(6, 105))
+  await expect.poll(() => atBottom(a)).toBe(true)
+  // The other client uses the same nickname (duplicates are allowed), so a scroll triggered
+  // by the nickname of an arriving message instead of the own send's ack would fail below.
+  const b = await openChat(browser, baseURL!, 'B', 'Alice')
+
+  await scrollUpToMiddle(a)
+  // `send` waits until the input is cleared, which happens only after the server accepted it.
+  await send(a, 'own message while scrolled up')
+  await expect(messageText(a, 'own message while scrolled up')).toHaveCount(1)
+  await expect.poll(() => visibleWithoutScrolling(a, 'own message while scrolled up')).toBe(true)
+  await expect.poll(() => atBottom(a)).toBe(true)
+  expect((await scrollMetrics(a)).pageScrollY).toBe(0)
+  expect((await readMessages(a)).at(-1)).toEqual({ nickname: 'Alice', text: 'own message while scrolled up' })
+
+  // Scrolled up again: a message from another client, even one with the same nickname, still
+  // does not move the view.
+  const before = await scrollUpToMiddle(a)
+  await send(b, 'from the other Alice after the own message')
+  await expect(messageText(a, 'from the other Alice after the own message')).toHaveCount(1)
+  await nextFrames(a)
+  const after = await scrollMetrics(a)
+  expect(after.scrollTop).toBe(before.scrollTop)
+  expect(after.scrollHeight).toBeGreaterThan(before.scrollHeight)
+  expect(await visibleWithoutScrolling(a, 'from the other Alice after the own message')).toBe(false)
+  expect((await readMessages(a)).at(-1)).toEqual({ nickname: 'Alice', text: 'from the other Alice after the own message' })
+})
+
+test('a send rejected by the server does not move the view when the person has scrolled up', async ({
+  browser,
+  baseURL,
+  chatServer,
+}) => {
+  await seed(chatServer, numbered(105))
+  let breakNickname = true
+  let isUpgraded: () => boolean = () => false
+  const a = await openChat(browser, baseURL!, 'A', 'Alice', async (page) => {
+    // Corrupts the nickname in transit so that the real server rejects the send.
+    isUpgraded = await routeSends(page, (packet) =>
+      breakNickname ? packet.replace('"nickname":"Alice"', '"nickname":"bob@home"') : packet,
+    )
+  })
+  await expectMessages(a, shownRange(6, 105))
+  await expect.poll(isUpgraded).toBe(true)
+
+  const before = await scrollUpToMiddle(a)
+  await messageInput(a).fill('rejected while scrolled up')
+  await messageInput(a).press('Enter')
+  await expect(chatRegion(a).getByRole('alert')).toContainText('Message not sent')
+  await expect(messageInput(a)).toHaveValue('rejected while scrolled up')
+  await nextFrames(a)
+  expect((await scrollMetrics(a)).scrollTop).toBe(before.scrollTop)
+  await expect(messageText(a, 'rejected while scrolled up')).toHaveCount(0)
+
+  // Retry with the route repaired: the accepted message scrolls into view.
+  breakNickname = false
+  await sendButton(a).click()
+  await expect(messageInput(a)).toHaveValue('')
+  await expect.poll(() => visibleWithoutScrolling(a, 'rejected while scrolled up')).toBe(true)
+  await expect.poll(() => atBottom(a)).toBe(true)
 })
 
 test('3 seeded messages show all 3, oldest first, with their nicknames and times', async ({
@@ -359,6 +459,32 @@ test('3 seeded messages show all 3, oldest first, with their nicknames and times
   await expect(emptyHint(a)).toHaveCount(0)
   await expect.poll(() => visibleWithoutScrolling(a, 'first')).toBe(true)
   await expect.poll(() => visibleWithoutScrolling(a, 'third')).toBe(true)
+})
+
+test('no empty-room hint is shown before the history has arrived', async ({ browser, baseURL }) => {
+  // Hold every Socket.IO polling request until released, so no `history` event can arrive.
+  let release!: () => void
+  const gate = new Promise<void>((resolve) => {
+    release = resolve
+  })
+  const a = await openClient(browser, baseURL!, 'A', async (page) => {
+    await page.route('**/socket.io/?EIO=4&transport=polling*', async (route) => {
+      await gate
+      await route.continue()
+    })
+  })
+  await a.getByLabel('Nickname', { exact: true }).fill('Alice')
+  await a.getByRole('button', { name: 'Join' }).click()
+  await expect(a.getByText(/^Chatting as /)).toHaveText('Chatting as Alice')
+  await expect(sendButton(a)).toBeDisabled()
+  await nextFrames(a)
+  await expect(emptyHint(a)).toHaveCount(0)
+  await expect(messageList(a)).toHaveCount(0)
+
+  // Once the history (of an empty room) has arrived, the hint is shown.
+  release()
+  await expect(sendButton(a)).toBeEnabled()
+  await expect(emptyHint(a)).toBeVisible()
 })
 
 test('an empty room shows a hint that there are no messages yet, which disappears when a message arrives', async ({
