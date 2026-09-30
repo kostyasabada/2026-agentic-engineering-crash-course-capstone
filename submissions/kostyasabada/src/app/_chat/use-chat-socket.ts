@@ -21,6 +21,8 @@ export type SendResult = { ok: true } | { ok: false; error: string }
 export type ChatSocket = {
   /** Messages ordered by server id, oldest first, each id once. */
   messages: ChatMessage[]
+  /** Whether a `history` event has arrived since the page loaded (the room's state is known). */
+  historyLoaded: boolean
   /** The current connection status. */
   status: ConnectionStatus
   /** Whether the socket is connected (`status === 'Connected'`); sending is possible only then. */
@@ -57,6 +59,7 @@ const TIMED_OUT = `Message not sent: the server did not confirm it within ${SEND
  */
 export function useChatSocket(): ChatSocket {
   const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [historyLoaded, setHistoryLoaded] = useState(false)
   const [status, setStatus] = useState<ConnectionStatus>('Disconnected')
   const socketRef = useRef<Socket | null>(null)
   const lastSeenIdRef = useRef<number | undefined>(undefined)
@@ -85,7 +88,10 @@ export function useChatSocket(): ChatSocket {
     })
     manager.on('reconnect_attempt', onReconnectAttempt)
     manager.on('reconnect_failed', onReconnectFailed)
-    socket.on('history', (history: HistoryEvent) => setMessages((current) => applyHistory(current, history)))
+    socket.on('history', (history: HistoryEvent) => {
+      setMessages((current) => applyHistory(current, history))
+      setHistoryLoaded(true)
+    })
     socket.on('message:new', (message: ChatMessage) => setMessages((current) => mergeMessages(current, [message])))
     return () => {
       socketRef.current = null
@@ -112,5 +118,5 @@ export function useChatSocket(): ChatSocket {
     return { ok: true }
   }, [])
 
-  return { messages, status, connected: status === 'Connected', send }
+  return { messages, historyLoaded, status, connected: status === 'Connected', send }
 }

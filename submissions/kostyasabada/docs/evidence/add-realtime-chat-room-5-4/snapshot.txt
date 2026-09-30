@@ -1,0 +1,20 @@
+# Snapshot for add-realtime-chat-room-5-4 (revision 1)
+base_commit: b9fb1e7
+paths relative to the repository root; sha256sum output; nothing staged or committed; snapshot.txt, implementation.md, and checks.txt are evidence reports and not part of the hashed deliverables (the final checks.txt hash is stated at the end)
+
+## Deliverables
+85b39c394ca48ad3f0d114072834e3a039d5745695f2a147b5f6f29f806fcdfb  submissions/kostyasabada/e2e/history.spec.ts
+9f6841ae877e6e8fe870e686f926c24d1b739c9406c180fb6517c6470882d795  submissions/kostyasabada/src/app/_chat/message-list.tsx
+8d96f67b7c9f7e591396b77084f7762367946a3f5789c9a82407d61166f74254  submissions/kostyasabada/src/app/_chat/use-chat-socket.ts
+6895ee498a70445869cadcf6e33ffb5b3799be6a95ee1a419dfaf26ac2ff0f64  submissions/kostyasabada/src/app/_chat/chat-room.tsx
+ad2bd85d27efdbda6ac661382c83238a054170f59d02c9c957c92a64de6f3e11  submissions/kostyasabada/src/app/globals.css
+
+## Supplementary screenshots
+199b0d96a078bd15974e285e5ab62cac697e23270b9debbf65173b80c4f1b4de  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-5-4/history-105-at-bottom.png
+ee0fd5e6bdec7829236eaee007b0db2900dc05c4a387d34d8887d668661c8706  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-5-4/history-scrolled-up-new-message.png
+
+## Evidence reports (not hashed deliverables; implementation.md final, re-hashed after its whitespace row was updated following the FINAL entry of checks.txt)
+46bd3768baa95ea23ce10961b60024477c0f16fe5c0870c2d20796091d4d70b7  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-5-4/implementation.md
+
+## Evidence log
+checks.txt (final; not re-hashed inside itself): e8ed0b2727aae8951a19a2891a9d21a8b91c80c4057be0b8a168eef1b9a77037  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-5-4/checks.txt

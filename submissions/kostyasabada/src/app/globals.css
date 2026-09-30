@@ -1,5 +1,6 @@
 :root {
   color-scheme: light dark;
+  --border: #c4c7c5;
   --error: #b3261e;
   --muted: #5f6368;
   --ok: #1e7b34;
@@ -8,6 +9,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
+    --border: #5f6368;
     --error: #f2b8b5;
     --muted: #a8adb3;
     --ok: #8fd19e;
@@ -103,10 +105,22 @@ textarea {
   color: var(--error);
 }
 
+/* The conversation scrolls inside the list (design Q4; see message-list.tsx), so the
+   composer stays in view; the page itself does not need to scroll. */
 .message-list {
   list-style: none;
   margin: 1rem 0;
-  padding: 0;
+  padding: 0 0.5rem;
+  max-height: min(50vh, 32rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--border);
+  border-radius: 0.25rem;
+}
+
+.message-list__empty {
+  margin: 1rem 0;
+  color: var(--muted);
 }
 
 .message {

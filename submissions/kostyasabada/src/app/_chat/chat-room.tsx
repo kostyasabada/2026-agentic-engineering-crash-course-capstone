@@ -101,7 +101,7 @@ export function ChatRoom() {
         </div>
       )}
       <ConnectionStatus status={chat.status} />
-      <MessageList messages={chat.messages} />
+      <MessageList messages={chat.messages} historyLoaded={chat.historyLoaded} />
       <Composer nickname={nickname} connected={chat.connected} onSend={chat.send} />
     </section>
   )
