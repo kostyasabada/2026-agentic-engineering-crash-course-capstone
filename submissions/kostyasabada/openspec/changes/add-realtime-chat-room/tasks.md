@@ -41,4 +41,4 @@ Rules for every task below (from `docs/review-process.md`): the main agent only 
 
 ## 6. Integration
 
-- [ ] 6.1 From a clean checkout of the final commit, run `npm ci`, `npm exec -- playwright install chromium` (if needed), `npm run check`, and `npm run --silent openspec -- validate --all --strict`; the checker reruns them independently. Supplementary: a manual two-browser session with screenshots, labelled as supplementary. Verify: all commands exit 0, outputs recorded in `docs/evidence/add-realtime-chat-room-6-1/checks.txt`, checker verdict `accepted` in `review.md`.
+- [x] 6.1 From a clean checkout of the final commit, run `npm ci`, `npm exec -- playwright install chromium` (if needed), `npm run check`, and `npm run --silent openspec -- validate --all --strict`; the checker reruns them independently. Supplementary: a manual two-browser session with screenshots, labelled as supplementary. Verify: all commands exit 0, outputs recorded in `docs/evidence/add-realtime-chat-room-6-1/checks.txt`, checker verdict `accepted` in `review.md`.

@@ -54,3 +54,44 @@ The checker's Phase A round 1 in `review.md` requested changes: three low findin
 - Finding 3 (this file, line 34): correction. The Stale-phrase grep section says "`openspec/specs/` does not exist". That is wrong. `openspec/specs/` exists and holds only a tracked `.gitkeep`, and `openspec/changes/archive/` also holds only a tracked `.gitkeep` (`git ls-files`, in `checks.txt` Round 2). The conclusion does not change: the `docs/workflow.md:48` statement that both stay empty until the change is archived is still true.
 - Info note 4 (`docs/architecture.md:26`): the sentence now says that `dev` and `start` run `node --import tsx server.ts` directly, while `check` and `check:loop` do so through the E2E fixture.
 - Changed in round 2: `docs/architecture.md` (lines 26 and 48) and `docs/testing.md` (line 60), plus appended Round 2 sections in this file and in `checks.txt`, and a regenerated `snapshot.txt` (phase A revision 2, base `e5c9a22`). No other lines changed; the diff against the round 1 copies is in `checks.txt`. `review.md` was not edited.
+
+## Phase B: clean-checkout verification
+
+- Maker: Claude Code general-purpose subagent (maker, phase B), fresh context, scoped handoff from the coordinator. Separate from the phase A maker and from the checker.
+- Date: 2026-09-30. Node v24.21.0 (`~/.nvm/versions/node/v24.21.0/bin` first on `PATH`), npm 11.19.0, git 2.53.0.
+- Final commit: `e4ed364` (`e4ed36401c70a5664d6ba40e8235b3015d43acdf`), the real repository's HEAD with an empty `git status --short` at the start.
+- Clean checkout: `git clone --no-hardlinks <repo> <scratchpad>/clean-6-1`, `git checkout --detach e4ed364`; the clone was clean (`git status --short --ignored` empty, so no `node_modules`, `.next`, or `data`). All commands ran in `<clone>/submissions/kostyasabada`. The clone was removed at the end, after its path and HEAD were recorded (`checks.txt` B1, B5).
+- Everything above this section is unchanged (append-only). No code or documentation changed; no checkbox ticked; no staging or commit; the agent loop was not run. `review.md` was not edited.
+
+### Task 6.1 commands (details, full logs, and helper bodies in `checks.txt`, "PHASE B")
+
+| Command | Exit | Result |
+|---|---:|---|
+| `npm ci` | 0 | 448 packages added, 449 audited, 0 vulnerabilities, 6 s |
+| `npm exec -- playwright install chromium` | 0 | nothing downloaded: Chromium 1243, headless shell 1243, and ffmpeg 1011 were already in `~/.cache/ms-playwright`, outside the repository; Playwright 1.63.0 |
+| `npm run check` | 0 | lint and typecheck clean; Vitest 10 files, 465 passed (14.56 s); `next build`; Playwright 52 passed (1.8 min); 135 s wall time |
+| `npm run --silent openspec -- validate --all --strict` | 0 | `Totals: 1 passed, 0 failed (1 items)` |
+| `npm run check:loop` (supplementary) | 0 | Vitest 465 passed; Playwright in dev mode 52 passed (2.6 min); 179 s wall time |
+
+The counts match the `docs/testing.md` coverage tables (465 unit, 52 E2E).
+
+Warnings, none of them failures: `npm ci` reports `eslint@9.39.5` as deprecated and lists three packages whose install scripts are "not yet covered by allowScripts" (`better-sqlite3`, `esbuild`, `unrs-resolver`). The SQLite-backed tests passed, so the native addon was built or loaded. Vitest prints a Vite `configLoader: 'native'` notice about `vitest.config.ts`.
+
+### Supplementary manual two-browser session
+
+This session is supplementary. Screenshots do not prove delivery or persistence (`docs/review-process.md`); the automated E2E tests above are the behavioral evidence.
+
+- `npm start` (on the build from `npm run check`) ran in its own process group (`setsid`), with `CHAT_DB_PATH` inside the clone (`<clone>/manual-6-1/chat.sqlite`). It printed `> Ready on http://127.0.0.1:3000 (production)`.
+- A Playwright script (`two-browsers.mjs`, headless Chromium, not a test) opened two independent browser contexts, joined as Alice and Bob, and exchanged three messages (Alice, Bob, Alice). Both contexts showed `Connected` and the same three messages in the same order, read from the DOM and printed in `checks.txt` B4.
+- Screenshots (supplementary): `supplementary-alice.png` and `supplementary-bob.png` show each context, and `supplementary-two-browsers.png` shows both side by side, with the nickname, the `Connected` status, the three messages with local `HH:MM` times, and the composer.
+- Shutdown: `SIGTERM` to the process group. The server logged `> Received SIGTERM, shutting down` and `> Server closed`, and the npm wrapper exited with 143 (as documented in the README). Afterwards the process group was empty and port 3000 was free. The server process's own exit status was not captured separately.
+
+### Cleanup
+
+No process matching `server.ts|next|playwright|vitest|tsx` (node or Chromium) remained, and nothing listened on port 3000, both before and after removing the clone (`checks.txt` B5).
+
+### Limitations
+
+- `npm exec -- playwright install chromium` downloaded nothing, because the machine's browser cache already held the matching Chromium build. A machine without that cache would download it; that case was not exercised.
+- The clone's single `git status --short` entry at cleanup is attributed to the untracked `manual-6-1/` session database directory. It was not listed before the clone was removed.
+- The checker's independent rerun and verdict are still required. Task 6.1 is not complete until `review.md` records `accepted`.

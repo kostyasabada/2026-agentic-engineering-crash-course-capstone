@@ -294,3 +294,740 @@ $ git status --short; git diff --stat
  5 files changed, 54 insertions(+), 24 deletions(-)
 $ ss -ltn | grep -c ':3000 '
 0
+
+################################################################################
+# PHASE B: clean-checkout verification (task 6.1)
+################################################################################
+# Maker: Claude Code general-purpose subagent (maker, phase B), fresh context, scoped handoff.
+# Final commit: e4ed364 (e4ed36401c70a5664d6ba40e8235b3015d43acdf). Date 2026-09-30.
+# $SP = /tmp/claude-1000/-home-ksabada-projects-AI-course-2026-agentic-engineering-crash-course-capstone/4034e690-c8bb-4005-a19e-8b3d5038ed0e/scratchpad
+# $CLONE = $SP/clean-6-1 (outside the repository; removed at the end, see B5).
+# Each helper ran as the only command of its shell call, stdout+stderr to $SP/phaseb/<name>.out;
+# exit codes are measured (set -o pipefail; [exit N] lines). Everything above this heading is
+# unchanged phase A text (append-only; checked in B8).
+# Before appending, the committed phase A files hash to the phase A revision 2 snapshot:
+# checks.txt 31b44f09..., implementation.md e9e23d14... (sha256sum of the copies, 2026-09-30T13:14Z).
+
+## B0 Helper bodies
+
+### $SP/phaseb/setup.sh
+#!/usr/bin/env bash
+# setup.sh (task 6.1 phase B): records tool versions, verifies the real repo HEAD and a clean
+# working tree, makes a clean clone outside the repo, detaches at the final commit, and checks
+# that the clone is clean and has no node_modules/.next/data.
+set -o pipefail
+export PATH=$HOME/.nvm/versions/node/v24.21.0/bin:$PATH
+REPO=/home/ksabada/projects/AI_course/2026-agentic-engineering-crash-course-capstone
+SP=/tmp/claude-1000/-home-ksabada-projects-AI-course-2026-agentic-engineering-crash-course-capstone/4034e690-c8bb-4005-a19e-8b3d5038ed0e/scratchpad
+CLONE=$SP/clean-6-1
+step() { echo; echo "\$ $*"; "$@"; echo "[exit $?]"; }
+echo "date: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+step node --version
+step npm --version
+step git --version
+step git -C $REPO rev-parse HEAD
+echo; echo "\$ git -C \$REPO status --short | wc -l"; git -C $REPO status --short | wc -l; echo "[exit ${PIPESTATUS[0]}]"
+step git clone --no-hardlinks $REPO $CLONE
+step git -C $CLONE checkout --detach e4ed36401c70a5664d6ba40e8235b3015d43acdf
+step git -C $CLONE rev-parse HEAD
+step git -C $CLONE status
+echo; echo "\$ git -C \$CLONE status --short --ignored | wc -l"; git -C $CLONE status --short --ignored | wc -l; echo "[exit ${PIPESTATUS[0]}]"
+echo; echo '$ ls -d $CLONE/submissions/kostyasabada/{node_modules,.next,data,test-results,playwright-report}'
+ls -d $CLONE/submissions/kostyasabada/{node_modules,.next,data,test-results,playwright-report} 2>&1; echo "[exit $?] (2 = none exist)"
+
+### $SP/phaseb/checks.sh
+#!/usr/bin/env bash
+# checks.sh (task 6.1 phase B): runs the task 6.1 commands in the clean clone's submission
+# directory. Full outputs go to $OUT/<name>.log; this script prints the command, timing,
+# measured exit code, and a tail of each log.
+set -o pipefail
+export PATH=$HOME/.nvm/versions/node/v24.21.0/bin:$PATH
+SP=/tmp/claude-1000/-home-ksabada-projects-AI-course-2026-agentic-engineering-crash-course-capstone/4034e690-c8bb-4005-a19e-8b3d5038ed0e/scratchpad
+OUT=$SP/phaseb
+cd $SP/clean-6-1/submissions/kostyasabada || exit 99
+run() { # run <name> <tail-lines> <cmd...>
+  local name=$1 n=$2; shift 2
+  echo; echo "\$ $*   (cwd: \$CLONE/submissions/kostyasabada; full output: $name.log)"
+  local t0=$(date +%s); echo "start: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+  "$@" > $OUT/$name.log 2>&1; local rc=$?
+  echo "end: $(date -u +%Y-%m-%dT%H:%M:%SZ) (wall $(( $(date +%s) - t0 )) s)"
+  echo "--- tail -$n $name.log:"; tail -n $n $OUT/$name.log
+  echo "[exit $rc]"
+  return $rc
+}
+echo "HEAD: $(git rev-parse HEAD)"; echo "node $(node --version), npm $(npm --version)"
+run npm-ci 12 npm ci
+echo "--- warnings in npm-ci.log (grep -niE 'warn|deprecat|install script|allow-scripts|gyp'):"; grep -niE 'warn|deprecat|install script|allow-scripts|gyp' $OUT/npm-ci.log || echo "(none; grep exit 1)"
+echo; echo "\$ ls ~/.cache/ms-playwright; du -sb ~/.cache/ms-playwright  (before)"
+ls ~/.cache/ms-playwright; du -sb ~/.cache/ms-playwright; find ~/.cache/ms-playwright -maxdepth 1 -printf '%TY-%Tm-%TdT%TH:%TM %f\n' | sort > $OUT/pw-before.txt
+run pw-install 20 npm exec -- playwright install chromium
+echo "\$ du -sb ~/.cache/ms-playwright; diff of top-level entries (with mtimes) before/after"
+du -sb ~/.cache/ms-playwright; find ~/.cache/ms-playwright -maxdepth 1 -printf '%TY-%Tm-%TdT%TH:%TM %f\n' | sort > $OUT/pw-after.txt
+diff $OUT/pw-before.txt $OUT/pw-after.txt && echo "(no change; diff exit 0)"
+echo "\$ npx playwright --version"; npx playwright --version
+run check 40 npm run check
+run validate 10 npm run --silent openspec -- validate --all --strict
+run check-loop 25 npm run check:loop
+echo; echo '$ git status --short --ignored  (clone, after the runs)'; git status --short --ignored
+echo "\$ git status --short | wc -l"; git status --short | wc -l
+
+### $SP/phaseb/manual.sh
+#!/usr/bin/env bash
+# manual.sh (task 6.1 phase B, SUPPLEMENTARY): starts `npm start` (after the build of
+# `npm run check`) in the clean clone in its own process group (setsid) with CHAT_DB_PATH in the
+# clone's scratch directory, waits for the ready line, runs two-browsers.mjs, then sends SIGTERM
+# to the process group and records exit codes, the shutdown log lines, the port, and the WAL file.
+set -o pipefail
+export PATH=$HOME/.nvm/versions/node/v24.21.0/bin:$PATH
+SP=/tmp/claude-1000/-home-ksabada-projects-AI-course-2026-agentic-engineering-crash-course-capstone/4034e690-c8bb-4005-a19e-8b3d5038ed0e/scratchpad
+export SUB=$SP/clean-6-1/submissions/kostyasabada SHOTS=$SP/phaseb/shots BASE=http://127.0.0.1:3000
+DB=$SP/clean-6-1/manual-6-1/chat.sqlite
+cd $SUB || exit 99
+echo "date: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+echo "\$ ss -ltn | grep -c ':3000 '  (before)"; ss -ltn | grep -c ':3000 '
+echo "\$ CHAT_DB_PATH=\$CLONE/manual-6-1/chat.sqlite setsid npm start > server.log 2>&1 &"
+CHAT_DB_PATH=$DB setsid npm start > $SP/phaseb/server.log 2>&1 &
+PG=$!
+for i in $(seq 1 60); do grep -q 'Ready on' $SP/phaseb/server.log && break; sleep 0.5; done
+echo "npm pid/pgid: $PG; process group members (pid pgid comm):"; ps -o pid=,pgid=,comm= -g $PG
+echo "--- server.log so far:"; cat $SP/phaseb/server.log
+echo; echo "\$ node two-browsers.mjs"
+node $SP/phaseb/two-browsers.mjs; echo "[exit $?]"
+echo; echo "\$ kill -TERM -$PG  (whole process group)"
+kill -TERM -$PG; echo "[exit $?]"
+wait $PG; echo "npm start (wrapper) exit status: $?"
+for i in $(seq 1 20); do ps -o pid= -g $PG >/dev/null || break; sleep 0.25; done
+echo "process group members after shutdown: $(ps -o pid=,comm= -g $PG || echo none)"
+echo "--- server.log (full):"; cat $SP/phaseb/server.log
+echo "\$ ss -ltn | grep -c ':3000 '  (after)"; ss -ltn | grep -c ':3000 '
+echo "\$ ls -A \$CLONE/manual-6-1"; ls -A $SP/clean-6-1/manual-6-1
+echo "\$ ls -la shots"; ls -la $SHOTS
+
+### $SP/phaseb/two-browsers.mjs
+// two-browsers.mjs (task 6.1 phase B, SUPPLEMENTARY manual session; not a test). Drives the
+// already running `npm start` server at BASE with two independent headless Chromium contexts
+// (Alice, Bob), exchanges messages, prints what each context shows, and saves screenshots:
+// each context separately, and both side by side (composited in a third page from the two PNGs).
+import path from 'node:path'
+import { readFile } from 'node:fs/promises'
+import { createRequire } from 'node:module'
+const SUB = process.env.SUB, OUT = process.env.SHOTS, BASE = process.env.BASE
+const { chromium, expect } = createRequire(path.join(SUB, 'package.json'))('@playwright/test')
+const browser = await chromium.launch()
+try {
+  const open = async (nickname) => {
+    const context = await browser.newContext({ baseURL: BASE, viewport: { width: 760, height: 620 } })
+    const page = await context.newPage()
+    page.on('pageerror', (e) => console.log(`${nickname} pageerror: ${e.message}`))
+    page.on('console', (m) => { if (m.type() === 'error') console.log(`${nickname} console error: ${m.text()}`) })
+    await page.goto('/')
+    await page.getByLabel('Nickname', { exact: true }).fill(nickname)
+    await page.getByRole('button', { name: 'Join' }).click()
+    await expect(page.getByText(/^Chatting as /)).toHaveText(`Chatting as ${nickname}`)
+    await expect(page.getByRole('button', { name: 'Send', exact: true })).toBeEnabled()
+    return page
+  }
+  const send = async (page, text) => {
+    const input = page.getByRole('textbox', { name: 'Message', exact: true })
+    await input.fill(text)
+    await input.press('Enter')
+    await expect(input).toHaveValue('')
+  }
+  const shown = (page) => page.getByRole('list', { name: 'Messages' }).getByRole('listitem').evaluateAll((items) =>
+    items.map((i) => `${i.querySelector('.message__author')?.textContent}: ${i.querySelector('.message__text')?.textContent}`))
+  const status = (page) => page.getByRole('region', { name: 'Chat', exact: true }).getByRole('status').textContent()
+  const alice = await open('Alice')
+  const bob = await open('Bob')
+  await send(alice, 'Hi Bob, this is Alice (phase B manual session).')
+  await send(bob, 'Hi Alice, Bob here. Your message arrived.')
+  await send(alice, 'Great, real-time delivery works in both directions.')
+  const expected = [
+    'Alice: Hi Bob, this is Alice (phase B manual session).',
+    'Bob: Hi Alice, Bob here. Your message arrived.',
+    'Alice: Great, real-time delivery works in both directions.',
+  ]
+  for (const [name, page] of [['Alice', alice], ['Bob', bob]]) {
+    await expect.poll(() => shown(page)).toEqual(expected)
+    console.log(`${name} status: ${await status(page)}`)
+    console.log(`${name} shows:\n  ${(await shown(page)).join('\n  ')}`)
+  }
+  const a = path.join(OUT, 'supplementary-alice.png'), b = path.join(OUT, 'supplementary-bob.png')
+  await alice.screenshot({ path: a })
+  await bob.screenshot({ path: b })
+  const uri = async (f) => `data:image/png;base64,${(await readFile(f)).toString('base64')}`
+  const combo = await (await browser.newContext({ viewport: { width: 1560, height: 680 } })).newPage()
+  await combo.setContent(`<body style="margin:0;padding:10px;background:#888;display:flex;gap:20px;font:14px sans-serif">
+    <figure style="margin:0"><img src="${await uri(a)}"><figcaption>Context 1: Alice (supplementary)</figcaption></figure>
+    <figure style="margin:0"><img src="${await uri(b)}"><figcaption>Context 2: Bob (supplementary)</figcaption></figure></body>`)
+  await combo.screenshot({ path: path.join(OUT, 'supplementary-two-browsers.png'), fullPage: true })
+  console.log('screenshots saved')
+} finally {
+  await browser.close()
+}
+
+### $SP/phaseb/cleanup.sh
+#!/usr/bin/env bash
+# cleanup.sh (task 6.1 phase B): records the clone's path and HEAD, copies the supplementary
+# screenshots into the real repo's evidence directory, checks for leftover processes and a
+# listener on port 3000 (procs.sh), and removes the clone.
+set -o pipefail
+SP=/tmp/claude-1000/-home-ksabada-projects-AI-course-2026-agentic-engineering-crash-course-capstone/4034e690-c8bb-4005-a19e-8b3d5038ed0e/scratchpad
+CLONE=$SP/clean-6-1
+EV=/home/ksabada/projects/AI_course/2026-agentic-engineering-crash-course-capstone/submissions/kostyasabada/docs/evidence/add-realtime-chat-room-6-1
+echo "date: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+echo "clone path: $CLONE"; echo "\$ git -C \$CLONE rev-parse HEAD"; git -C $CLONE rev-parse HEAD; echo "[exit $?]"
+echo "\$ git -C \$CLONE status --short | wc -l"; git -C $CLONE status --short | wc -l
+echo "\$ cp shots/supplementary-*.png \$EV/"; cp $SP/phaseb/shots/supplementary-*.png $EV/; echo "[exit $?]"
+echo "\$ sha256sum (shots in scratchpad vs copies)"; (cd $SP/phaseb/shots && sha256sum supplementary-*.png) ; (cd $EV && sha256sum supplementary-*.png | sha256sum -c --quiet <(cd $SP/phaseb/shots && sha256sum supplementary-*.png) && echo "copies identical")
+echo "\$ bash procs.sh  (before removing the clone)"; bash $SP/procs.sh
+echo "\$ rm -rf \$CLONE"; rm -rf $CLONE; echo "[exit $?]"
+echo "\$ test -e \$CLONE"; test -e $CLONE; echo "[exit $?] (1 = removed)"
+echo "\$ bash procs.sh  (after)"; bash $SP/procs.sh
+
+### $SP/procs.sh (existing helper, reused unchanged)
+#!/usr/bin/env bash
+# procs.sh: lists only node / headless Chromium processes whose command line mentions
+# server.ts, next, playwright, vitest, or tsx (the recorder's bash wrappers are excluded
+# because their first word is /bin/bash). Also reports a listener on port 3000.
+out=$(pgrep -af '^[^ ]*(/node|headless_shell|/chrome) ' | grep -E 'server\.ts|next|playwright|vitest|tsx')
+if [ -n "$out" ]; then echo "$out" | cut -c1-200; else echo "no matching processes"; fi
+ss -ltn 2>/dev/null | grep -E ':3000\b' || echo "port 3000: no listener"
+
+## B1 Tool versions, real repo HEAD and clean tree, clean clone (setup.sh; helper exit 0)
+date: 2026-09-30T13:06:51Z
+
+$ node --version
+v24.21.0
+[exit 0]
+
+$ npm --version
+11.19.0
+[exit 0]
+
+$ git --version
+git version 2.53.0
+[exit 0]
+
+$ git -C /home/ksabada/projects/AI_course/2026-agentic-engineering-crash-course-capstone rev-parse HEAD
+e4ed36401c70a5664d6ba40e8235b3015d43acdf
+[exit 0]
+
+$ git -C $REPO status --short | wc -l
+0
+[exit 0]
+
+$ git clone --no-hardlinks /home/ksabada/projects/AI_course/2026-agentic-engineering-crash-course-capstone /tmp/claude-1000/-home-ksabada-projects-AI-course-2026-agentic-engineering-crash-course-capstone/4034e690-c8bb-4005-a19e-8b3d5038ed0e/scratchpad/clean-6-1
+Cloning into '/tmp/claude-1000/-home-ksabada-projects-AI-course-2026-agentic-engineering-crash-course-capstone/4034e690-c8bb-4005-a19e-8b3d5038ed0e/scratchpad/clean-6-1'...
+done.
+[exit 0]
+
+$ git -C /tmp/claude-1000/-home-ksabada-projects-AI-course-2026-agentic-engineering-crash-course-capstone/4034e690-c8bb-4005-a19e-8b3d5038ed0e/scratchpad/clean-6-1 checkout --detach e4ed36401c70a5664d6ba40e8235b3015d43acdf
+HEAD is now at e4ed364 docs: bring project docs up to date for final verification (task 6.1 phase A)
+[exit 0]
+
+$ git -C /tmp/claude-1000/-home-ksabada-projects-AI-course-2026-agentic-engineering-crash-course-capstone/4034e690-c8bb-4005-a19e-8b3d5038ed0e/scratchpad/clean-6-1 rev-parse HEAD
+e4ed36401c70a5664d6ba40e8235b3015d43acdf
+[exit 0]
+
+$ git -C /tmp/claude-1000/-home-ksabada-projects-AI-course-2026-agentic-engineering-crash-course-capstone/4034e690-c8bb-4005-a19e-8b3d5038ed0e/scratchpad/clean-6-1 status
+HEAD detached at e4ed364
+nothing to commit, working tree clean
+[exit 0]
+
+$ git -C $CLONE status --short --ignored | wc -l
+0
+[exit 0]
+
+$ ls -d $CLONE/submissions/kostyasabada/{node_modules,.next,data,test-results,playwright-report}
+ls: cannot access '/tmp/claude-1000/-home-ksabada-projects-AI-course-2026-agentic-engineering-crash-course-capstone/4034e690-c8bb-4005-a19e-8b3d5038ed0e/scratchpad/clean-6-1/submissions/kostyasabada/node_modules': No such file or directory
+ls: cannot access '/tmp/claude-1000/-home-ksabada-projects-AI-course-2026-agentic-engineering-crash-course-capstone/4034e690-c8bb-4005-a19e-8b3d5038ed0e/scratchpad/clean-6-1/submissions/kostyasabada/.next': No such file or directory
+ls: cannot access '/tmp/claude-1000/-home-ksabada-projects-AI-course-2026-agentic-engineering-crash-course-capstone/4034e690-c8bb-4005-a19e-8b3d5038ed0e/scratchpad/clean-6-1/submissions/kostyasabada/data': No such file or directory
+ls: cannot access '/tmp/claude-1000/-home-ksabada-projects-AI-course-2026-agentic-engineering-crash-course-capstone/4034e690-c8bb-4005-a19e-8b3d5038ed0e/scratchpad/clean-6-1/submissions/kostyasabada/test-results': No such file or directory
+ls: cannot access '/tmp/claude-1000/-home-ksabada-projects-AI-course-2026-agentic-engineering-crash-course-capstone/4034e690-c8bb-4005-a19e-8b3d5038ed0e/scratchpad/clean-6-1/submissions/kostyasabada/playwright-report': No such file or directory
+[exit 2] (2 = none exist)
+
+## B2 npm ci, Playwright Chromium, npm run check, openspec validate --all --strict, npm run check:loop (checks.sh; helper exit 0)
+# Wall time of the helper: 13:07:19Z to 13:12:42Z. mtimes in the Playwright cache diff are local time (UTC+3).
+HEAD: e4ed36401c70a5664d6ba40e8235b3015d43acdf
+node v24.21.0, npm 11.19.0
+
+$ npm ci   (cwd: $CLONE/submissions/kostyasabada; full output: npm-ci.log)
+start: 2026-09-30T13:07:19Z
+end: 2026-09-30T13:07:25Z (wall 6 s)
+--- tail -12 npm-ci.log:
+added 448 packages, and audited 449 packages in 6s
+
+172 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+npm warn install-scripts 3 packages have install scripts not yet covered by allowScripts:
+npm warn install-scripts   better-sqlite3@13.0.3 (install: node-gyp rebuild)
+npm warn install-scripts   esbuild@0.28.2 (postinstall: node install.js)
+npm warn install-scripts   unrs-resolver@1.12.2 (postinstall: node postinstall.js)
+npm warn install-scripts
+npm warn install-scripts Run `npm install-scripts ls` to review, or `npm install-scripts approve <pkg>` to allow.
+[exit 0]
+--- warnings in npm-ci.log (grep -niE 'warn|deprecat|install script|allow-scripts|gyp'):
+1:npm warn deprecated eslint@9.39.5: This version is no longer supported. Please see https://eslint.org/version-support for other options.
+9:npm warn install-scripts 3 packages have install scripts not yet covered by allowScripts:
+10:npm warn install-scripts   better-sqlite3@13.0.3 (install: node-gyp rebuild)
+11:npm warn install-scripts   esbuild@0.28.2 (postinstall: node install.js)
+12:npm warn install-scripts   unrs-resolver@1.12.2 (postinstall: node postinstall.js)
+13:npm warn install-scripts
+14:npm warn install-scripts Run `npm install-scripts ls` to review, or `npm install-scripts approve <pkg>` to allow.
+
+$ ls ~/.cache/ms-playwright; du -sb ~/.cache/ms-playwright  (before)
+chromium-1243
+chromium_headless_shell-1243
+ffmpeg-1011
+687912082	/home/ksabada/.cache/ms-playwright
+
+$ npm exec -- playwright install chromium   (cwd: $CLONE/submissions/kostyasabada; full output: pw-install.log)
+start: 2026-09-30T13:07:25Z
+end: 2026-09-30T13:07:26Z (wall 1 s)
+--- tail -20 pw-install.log:
+[exit 0]
+$ du -sb ~/.cache/ms-playwright; diff of top-level entries (with mtimes) before/after
+687912290	/home/ksabada/.cache/ms-playwright
+1d0
+< 2026-09-26T09:23 .links
+5c4,5
+< 2026-09-26T20:39 ms-playwright
+---
+> 2026-09-30T16:07 .links
+> 2026-09-30T16:07 ms-playwright
+$ npx playwright --version
+Version 1.63.0
+
+$ npm run check   (cwd: $CLONE/submissions/kostyasabada; full output: check.log)
+start: 2026-09-30T13:07:27Z
+end: 2026-09-30T13:09:42Z (wall 135 s)
+--- tail -40 check.log:
+  ✓  15 [chromium] › e2e/host-policy.spec.ts:33:5 › the real server refuses a foreign Host and serves its own hosts (21ms)
+  ✓  16 [chromium] › e2e/host-policy.spec.ts:53:5 › the real server closes upgrades that neither Socket.IO nor Next.js owns (7ms)
+  ✓  17 [chromium] › e2e/messaging.spec.ts:154:5 › a message reaches another independent browser context without a reload (1.1s)
+  ✓  18 [chromium] › e2e/messaging.spec.ts:166:5 › two messages sent in quick succession appear in the same server order in both contexts (1.2s)
+  ✓  19 [chromium] › e2e/messaging.spec.ts:186:5 › markup in a message is shown literally: no element is created and no script runs (1.0s)
+  ✓  20 [chromium] › e2e/messaging.spec.ts:203:5 › a three-line message is shown on three lines (1.1s)
+  ✓  21 [chromium] › e2e/messaging.spec.ts:229:5 › surrounding whitespace is trimmed and the counter shows the trimmed length (1.1s)
+  ✓  22 [chromium] › e2e/messaging.spec.ts:244:5 › empty and whitespace-only messages are not sent (1.5s)
+  ✓  23 [chromium] › e2e/messaging.spec.ts:267:5 › oversized typed or pasted text is kept in full with the limit message and sending blocked (1.3s)
+  ✓  24 [chromium] › e2e/messaging.spec.ts:307:5 › a message of exactly 1000 characters is accepted (1.2s)
+  ✓  25 [chromium] › e2e/messaging.spec.ts:331:5 › 1000 characters surrounded by spaces (1020 before trimming) are accepted (1.0s)
+  ✓  26 [chromium] › e2e/messaging.spec.ts:348:5 › timestamps are shown as local HH:MM (1.7s)
+  ✓  27 [chromium] › e2e/messaging.spec.ts:378:5 › oversized and invalid-nickname payloads from a modified socket.io-client are rejected and not shown (1.1s)
+  ✓  28 [chromium] › e2e/messaging.spec.ts:414:5 › a socket.io-client connection with a foreign Origin is refused (648ms)
+  ✓  29 [chromium] › e2e/messaging.spec.ts:460:5 › a send rejected by the server shows the error and keeps the text for a retry (807ms)
+  ✓  30 [chromium] › e2e/messaging.spec.ts:491:5 › a send that is not confirmed within 5 seconds shows the error and keeps the text (6.0s)
+  ✓  31 [chromium] › e2e/messaging.spec.ts:535:5 › a malformed acknowledgement shows an error, keeps the text, and re-enables sending (1.0s)
+  ✓  32 [chromium] › e2e/messaging.spec.ts:578:5 › a valid trimmed nickname enables the message input and attributes messages to it (1.1s)
+  ✓  33 [chromium] › e2e/messaging.spec.ts:592:5 › while an empty or whitespace-only nickname is rejected, no message input is available (541ms)
+  ✓  34 [chromium] › e2e/messaging.spec.ts:606:5 › a changed nickname applies to later messages only, on every client and after a reload (1.4s)
+  ✓  35 [chromium] › e2e/messaging.spec.ts:629:5 › two clients with the same nickname can both send, each attributed to it (1.2s)
+  ✓  36 [chromium] › e2e/nickname.spec.ts:46:5 › a valid nickname is accepted and stored trimmed (447ms)
+  ✓  37 [chromium] › e2e/nickname.spec.ts:56:5 › an empty or whitespace-only nickname is rejected with a message (568ms)
+  ✓  38 [chromium] › e2e/nickname.spec.ts:70:5 › a too-long nickname is rejected and kept in full (393ms)
+  ✓  39 [chromium] › e2e/nickname.spec.ts:85:5 › surrounding whitespace does not count toward the limit; astral letters count as two units (502ms)
+  ✓  40 [chromium] › e2e/nickname.spec.ts:100:5 › nicknames with disallowed characters are rejected with the allowed characters listed (637ms)
+  ✓  41 [chromium] › e2e/nickname.spec.ts:113:5 › a nickname with combining marks is accepted as entered (426ms)
+  ✓  42 [chromium] › e2e/nickname.spec.ts:119:5 › the nickname is remembered after a reload (541ms)
+  ✓  43 [chromium] › e2e/nickname.spec.ts:128:5 › the nickname can be changed and the change survives a reload (671ms)
+  ✓  44 [chromium] › e2e/nickname.spec.ts:144:5 › an invalid nickname change is rejected and the previous nickname stays in use (749ms)
+  ✓  45 [chromium] › e2e/nickname.spec.ts:167:5 › the same nickname can be used in two independent browser contexts (894ms)
+  ✓  46 [chromium] › e2e/nickname.spec.ts:186:5 › an invalid stored nickname is ignored and the form is shown (489ms)
+  ✓  47 [chromium] › e2e/nickname.spec.ts:193:5 › the form still works when localStorage is unavailable (547ms)
+  ✓  48 [chromium] › e2e/shutdown.spec.ts:54:5 › the server shuts down promptly on SIGTERM while a connection has an unfinished request (2.1s)
+  ✓  49 [chromium] › e2e/shutdown.spec.ts:101:7 › the server shuts down gracefully on SIGTERM and keeps the stored messages (933ms)
+  ✓  50 [chromium] › e2e/shutdown.spec.ts:101:7 › the server shuts down gracefully on SIGINT and keeps the stored messages (930ms)
+  ✓  51 [chromium] › e2e/smoke.spec.ts:3:5 › the chat page loads through the custom server (380ms)
+  ✓  52 [chromium] › e2e/startup.spec.ts:16:5 › the server exits with code 1 when its port is already in use (462ms)
+
+  52 passed (1.8m)
+[exit 0]
+
+$ npm run --silent openspec -- validate --all --strict   (cwd: $CLONE/submissions/kostyasabada; full output: validate.log)
+start: 2026-09-30T13:09:42Z
+end: 2026-09-30T13:09:43Z (wall 1 s)
+--- tail -10 validate.log:
+- Validating...
+✓ change/add-realtime-chat-room
+Totals: 1 passed, 0 failed (1 items)
+[exit 0]
+
+$ npm run check:loop   (cwd: $CLONE/submissions/kostyasabada; full output: check-loop.log)
+start: 2026-09-30T13:09:43Z
+end: 2026-09-30T13:12:42Z (wall 179 s)
+--- tail -25 check-loop.log:
+  ✓  30 [chromium] › e2e/messaging.spec.ts:491:5 › a send that is not confirmed within 5 seconds shows the error and keeps the text (6.3s)
+  ✓  31 [chromium] › e2e/messaging.spec.ts:535:5 › a malformed acknowledgement shows an error, keeps the text, and re-enables sending (1.4s)
+  ✓  32 [chromium] › e2e/messaging.spec.ts:578:5 › a valid trimmed nickname enables the message input and attributes messages to it (1.4s)
+  ✓  33 [chromium] › e2e/messaging.spec.ts:592:5 › while an empty or whitespace-only nickname is rejected, no message input is available (719ms)
+  ✓  34 [chromium] › e2e/messaging.spec.ts:606:5 › a changed nickname applies to later messages only, on every client and after a reload (1.9s)
+  ✓  35 [chromium] › e2e/messaging.spec.ts:629:5 › two clients with the same nickname can both send, each attributed to it (1.5s)
+  ✓  36 [chromium] › e2e/nickname.spec.ts:46:5 › a valid nickname is accepted and stored trimmed (588ms)
+  ✓  37 [chromium] › e2e/nickname.spec.ts:56:5 › an empty or whitespace-only nickname is rejected with a message (779ms)
+  ✓  38 [chromium] › e2e/nickname.spec.ts:70:5 › a too-long nickname is rejected and kept in full (575ms)
+  ✓  39 [chromium] › e2e/nickname.spec.ts:85:5 › surrounding whitespace does not count toward the limit; astral letters count as two units (689ms)
+  ✓  40 [chromium] › e2e/nickname.spec.ts:100:5 › nicknames with disallowed characters are rejected with the allowed characters listed (971ms)
+  ✓  41 [chromium] › e2e/nickname.spec.ts:113:5 › a nickname with combining marks is accepted as entered (598ms)
+  ✓  42 [chromium] › e2e/nickname.spec.ts:119:5 › the nickname is remembered after a reload (797ms)
+  ✓  43 [chromium] › e2e/nickname.spec.ts:128:5 › the nickname can be changed and the change survives a reload (865ms)
+  ✓  44 [chromium] › e2e/nickname.spec.ts:144:5 › an invalid nickname change is rejected and the previous nickname stays in use (1.1s)
+  ✓  45 [chromium] › e2e/nickname.spec.ts:167:5 › the same nickname can be used in two independent browser contexts (1.3s)
+  ✓  46 [chromium] › e2e/nickname.spec.ts:186:5 › an invalid stored nickname is ignored and the form is shown (764ms)
+  ✓  47 [chromium] › e2e/nickname.spec.ts:193:5 › the form still works when localStorage is unavailable (774ms)
+  ✓  48 [chromium] › e2e/shutdown.spec.ts:54:5 › the server shuts down promptly on SIGTERM while a connection has an unfinished request (2.1s)
+  ✓  49 [chromium] › e2e/shutdown.spec.ts:101:7 › the server shuts down gracefully on SIGTERM and keeps the stored messages (964ms)
+  ✓  50 [chromium] › e2e/shutdown.spec.ts:101:7 › the server shuts down gracefully on SIGINT and keeps the stored messages (958ms)
+  ✓  51 [chromium] › e2e/smoke.spec.ts:3:5 › the chat page loads through the custom server (506ms)
+  ✓  52 [chromium] › e2e/startup.spec.ts:16:5 › the server exits with code 1 when its port is already in use (708ms)
+
+  52 passed (2.6m)
+[exit 0]
+
+$ git status --short --ignored  (clone, after the runs)
+!! .next/
+!! next-env.d.ts
+!! node_modules/
+!! playwright-report/
+!! test-results/
+$ git status --short | wc -l
+0
+
+### B2a Full npm-ci.log
+npm warn deprecated eslint@9.39.5: This version is no longer supported. Please see https://eslint.org/version-support for other options.
+
+added 448 packages, and audited 449 packages in 6s
+
+172 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+npm warn install-scripts 3 packages have install scripts not yet covered by allowScripts:
+npm warn install-scripts   better-sqlite3@13.0.3 (install: node-gyp rebuild)
+npm warn install-scripts   esbuild@0.28.2 (postinstall: node install.js)
+npm warn install-scripts   unrs-resolver@1.12.2 (postinstall: node postinstall.js)
+npm warn install-scripts
+npm warn install-scripts Run `npm install-scripts ls` to review, or `npm install-scripts approve <pkg>` to allow.
+### B2b pw-install.log: 0 bytes (no output). Chromium was not downloaded: the cache kept
+# chromium-1243, chromium_headless_shell-1243, ffmpeg-1011; only .links (Playwright's registry of installs,
+# +208 bytes for the clone's path) and the cache directory mtime changed. Browser cache is outside the repository.
+
+### B2c Full check.log (npm run check)
+
+> kostyasabada-chat-capstone@0.0.0 check
+> npm run lint && npm run typecheck && npm run test:unit && npm run test:e2e
+
+
+> kostyasabada-chat-capstone@0.0.0 lint
+> eslint .
+
+
+> kostyasabada-chat-capstone@0.0.0 typecheck
+> tsc --noEmit
+
+
+> kostyasabada-chat-capstone@0.0.0 test:unit
+> vitest run
+
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - ESM syntax in a file loaded as CommonJS (vitest.config.ts:1:1). Use a `.mjs` extension or set `"type": "module"` in the closest package.json
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+ RUN  v5.0.2 /tmp/claude-1000/-home-ksabada-projects-AI-course-2026-agentic-engineering-crash-course-capstone/4034e690-c8bb-4005-a19e-8b3d5038ed0e/scratchpad/clean-6-1/submissions/kostyasabada
+
+
+ Test Files  10 passed (10)
+      Tests  465 passed (465)
+   Start at  16:07:31
+   Duration  14.56s (tests 93%, transform 4%, import 3%)
+
+
+> kostyasabada-chat-capstone@0.0.0 test:e2e
+> next build && playwright test
+
+▲ Next.js 16.3.6 (Turbopack)
+✓ Running next.config took 6ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 3.0s
+  Running TypeScript ...
+  Finished TypeScript in 1845ms ...
+  Collecting page data using 4 workers ...
+  Generating static pages using 4 workers (0/3) ...
+✓ Generating static pages using 4 workers (3/3) in 303ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+└ ○ /_not-found
+
+
+○  (Static)  prerendered as static content
+
+
+Running 52 tests using 1 worker
+
+  ✓   1 [chromium] › e2e/connection.spec.ts:227:5 › stopping the server shows Reconnecting and disables sending while the typed text is kept (1.5s)
+  ✓   2 [chromium] › e2e/connection.spec.ts:257:5 › after a server restart the clients reconnect without a reload, show Connected, and keep the history without duplicates (4.4s)
+  ✓   3 [chromium] › e2e/connection.spec.ts:338:5 › messages sent while a client is disconnected are caught up in order without duplicates (4.8s)
+  ✓   4 [chromium] › e2e/connection.spec.ts:394:5 › a client whose last seen message is newer than the server's history replaces its list with the server's messages (3.0s)
+  ✓   5 [chromium] › e2e/connection.spec.ts:440:5 › a session ended by the server shows Disconnected and disables sending while the typed text is kept (4.6s)
+  ✓   6 [chromium] › e2e/history.spec.ts:275:5 › seeded 105 messages show exactly messages 6–105 oldest first, with message 105 visible without scrolling (1.4s)
+  ✓   7 [chromium] › e2e/history.spec.ts:302:5 › a new message from another client scrolls into view when the person is at the bottom (3.0s)
+  ✓   8 [chromium] › e2e/history.spec.ts:336:5 › a new message from another client does not move the view when the person has scrolled up (2.4s)
+  ✓   9 [chromium] › e2e/history.spec.ts:371:5 › the person's own message scrolls into view once the server accepts it, even when they have scrolled up (2.3s)
+  ✓  10 [chromium] › e2e/history.spec.ts:406:5 › a send rejected by the server does not move the view when the person has scrolled up (1.6s)
+  ✓  11 [chromium] › e2e/history.spec.ts:440:5 › 3 seeded messages show all 3, oldest first, with their nicknames and times (1.2s)
+  ✓  12 [chromium] › e2e/history.spec.ts:464:5 › no empty-room hint is shown before the history has arrived (529ms)
+  ✓  13 [chromium] › e2e/history.spec.ts:490:5 › an empty room shows a hint that there are no messages yet, which disappears when a message arrives (1.0s)
+  ✓  14 [chromium] › e2e/history.spec.ts:507:5 › after a server restart a new client shows identical history: ids, nicknames, texts, timestamps, order (2.9s)
+  ✓  15 [chromium] › e2e/host-policy.spec.ts:33:5 › the real server refuses a foreign Host and serves its own hosts (21ms)
+  ✓  16 [chromium] › e2e/host-policy.spec.ts:53:5 › the real server closes upgrades that neither Socket.IO nor Next.js owns (7ms)
+  ✓  17 [chromium] › e2e/messaging.spec.ts:154:5 › a message reaches another independent browser context without a reload (1.1s)
+  ✓  18 [chromium] › e2e/messaging.spec.ts:166:5 › two messages sent in quick succession appear in the same server order in both contexts (1.2s)
+  ✓  19 [chromium] › e2e/messaging.spec.ts:186:5 › markup in a message is shown literally: no element is created and no script runs (1.0s)
+  ✓  20 [chromium] › e2e/messaging.spec.ts:203:5 › a three-line message is shown on three lines (1.1s)
+  ✓  21 [chromium] › e2e/messaging.spec.ts:229:5 › surrounding whitespace is trimmed and the counter shows the trimmed length (1.1s)
+  ✓  22 [chromium] › e2e/messaging.spec.ts:244:5 › empty and whitespace-only messages are not sent (1.5s)
+  ✓  23 [chromium] › e2e/messaging.spec.ts:267:5 › oversized typed or pasted text is kept in full with the limit message and sending blocked (1.3s)
+  ✓  24 [chromium] › e2e/messaging.spec.ts:307:5 › a message of exactly 1000 characters is accepted (1.2s)
+  ✓  25 [chromium] › e2e/messaging.spec.ts:331:5 › 1000 characters surrounded by spaces (1020 before trimming) are accepted (1.0s)
+  ✓  26 [chromium] › e2e/messaging.spec.ts:348:5 › timestamps are shown as local HH:MM (1.7s)
+  ✓  27 [chromium] › e2e/messaging.spec.ts:378:5 › oversized and invalid-nickname payloads from a modified socket.io-client are rejected and not shown (1.1s)
+  ✓  28 [chromium] › e2e/messaging.spec.ts:414:5 › a socket.io-client connection with a foreign Origin is refused (648ms)
+  ✓  29 [chromium] › e2e/messaging.spec.ts:460:5 › a send rejected by the server shows the error and keeps the text for a retry (807ms)
+  ✓  30 [chromium] › e2e/messaging.spec.ts:491:5 › a send that is not confirmed within 5 seconds shows the error and keeps the text (6.0s)
+  ✓  31 [chromium] › e2e/messaging.spec.ts:535:5 › a malformed acknowledgement shows an error, keeps the text, and re-enables sending (1.0s)
+  ✓  32 [chromium] › e2e/messaging.spec.ts:578:5 › a valid trimmed nickname enables the message input and attributes messages to it (1.1s)
+  ✓  33 [chromium] › e2e/messaging.spec.ts:592:5 › while an empty or whitespace-only nickname is rejected, no message input is available (541ms)
+  ✓  34 [chromium] › e2e/messaging.spec.ts:606:5 › a changed nickname applies to later messages only, on every client and after a reload (1.4s)
+  ✓  35 [chromium] › e2e/messaging.spec.ts:629:5 › two clients with the same nickname can both send, each attributed to it (1.2s)
+  ✓  36 [chromium] › e2e/nickname.spec.ts:46:5 › a valid nickname is accepted and stored trimmed (447ms)
+  ✓  37 [chromium] › e2e/nickname.spec.ts:56:5 › an empty or whitespace-only nickname is rejected with a message (568ms)
+  ✓  38 [chromium] › e2e/nickname.spec.ts:70:5 › a too-long nickname is rejected and kept in full (393ms)
+  ✓  39 [chromium] › e2e/nickname.spec.ts:85:5 › surrounding whitespace does not count toward the limit; astral letters count as two units (502ms)
+  ✓  40 [chromium] › e2e/nickname.spec.ts:100:5 › nicknames with disallowed characters are rejected with the allowed characters listed (637ms)
+  ✓  41 [chromium] › e2e/nickname.spec.ts:113:5 › a nickname with combining marks is accepted as entered (426ms)
+  ✓  42 [chromium] › e2e/nickname.spec.ts:119:5 › the nickname is remembered after a reload (541ms)
+  ✓  43 [chromium] › e2e/nickname.spec.ts:128:5 › the nickname can be changed and the change survives a reload (671ms)
+  ✓  44 [chromium] › e2e/nickname.spec.ts:144:5 › an invalid nickname change is rejected and the previous nickname stays in use (749ms)
+  ✓  45 [chromium] › e2e/nickname.spec.ts:167:5 › the same nickname can be used in two independent browser contexts (894ms)
+  ✓  46 [chromium] › e2e/nickname.spec.ts:186:5 › an invalid stored nickname is ignored and the form is shown (489ms)
+  ✓  47 [chromium] › e2e/nickname.spec.ts:193:5 › the form still works when localStorage is unavailable (547ms)
+  ✓  48 [chromium] › e2e/shutdown.spec.ts:54:5 › the server shuts down promptly on SIGTERM while a connection has an unfinished request (2.1s)
+  ✓  49 [chromium] › e2e/shutdown.spec.ts:101:7 › the server shuts down gracefully on SIGTERM and keeps the stored messages (933ms)
+  ✓  50 [chromium] › e2e/shutdown.spec.ts:101:7 › the server shuts down gracefully on SIGINT and keeps the stored messages (930ms)
+  ✓  51 [chromium] › e2e/smoke.spec.ts:3:5 › the chat page loads through the custom server (380ms)
+  ✓  52 [chromium] › e2e/startup.spec.ts:16:5 › the server exits with code 1 when its port is already in use (462ms)
+
+  52 passed (1.8m)
+
+### B2d check-loop.log lines 1-35 (lines 36-89 are the E2E list; the tail is in B2 above)
+
+> kostyasabada-chat-capstone@0.0.0 check:loop
+> npm run lint && npm run typecheck && npm run test:unit && npm run test:e2e:dev
+
+
+> kostyasabada-chat-capstone@0.0.0 lint
+> eslint .
+
+
+> kostyasabada-chat-capstone@0.0.0 typecheck
+> tsc --noEmit
+
+
+> kostyasabada-chat-capstone@0.0.0 test:unit
+> vitest run
+
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - ESM syntax in a file loaded as CommonJS (vitest.config.ts:1:1). Use a `.mjs` extension or set `"type": "module"` in the closest package.json
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+ RUN  v5.0.2 /tmp/claude-1000/-home-ksabada-projects-AI-course-2026-agentic-engineering-crash-course-capstone/4034e690-c8bb-4005-a19e-8b3d5038ed0e/scratchpad/clean-6-1/submissions/kostyasabada
+
+
+ Test Files  10 passed (10)
+      Tests  465 passed (465)
+   Start at  16:09:48
+   Duration  14.01s (tests 92%, transform 5%, import 3%)
+
+
+> kostyasabada-chat-capstone@0.0.0 test:e2e:dev
+> E2E_SERVER_MODE=dev playwright test
+
+
+Running 52 tests using 1 worker
+
+
+### B2e Full validate.log
+- Validating...
+✓ change/add-realtime-chat-room
+Totals: 1 passed, 0 failed (1 items)
+
+## B3 Summary of the task 6.1 commands (from B2)
+# npm ci                                             exit 0  added 448 packages, audited 449, found 0 vulnerabilities (6 s)
+# npm exec -- playwright install chromium            exit 0  nothing downloaded (1 s); Playwright 1.63.0
+# npm run check                                      exit 0  lint, typecheck; Vitest 10 files / 465 passed (14.56 s);
+#                                                            next build; Playwright 52 passed (1.8m); wall 135 s
+# npm run --silent openspec -- validate --all --strict  exit 0  Totals: 1 passed, 0 failed (1 items)
+# npm run check:loop (supplementary)                 exit 0  Vitest 465 passed (14.01 s); Playwright dev 52 passed (2.6m); wall 179 s
+# Warnings: npm ci 'deprecated eslint@9.39.5' and 'install-scripts ... not yet covered by allowScripts' for
+# better-sqlite3, esbuild, unrs-resolver (warning only; SQLite-backed unit and E2E tests passed, so the native addon
+# loaded); Vitest '(!) Your Vite config uses features that are unsupported by configLoader: native' (warning only).
+# npm writes debug logs to ~/.npm/_logs (outside the repository), as expected for npm commands.
+
+## B4 SUPPLEMENTARY manual two-browser session (manual.sh; helper exit 0)
+# Supplementary only: screenshots do not prove delivery or persistence (docs/review-process.md); the
+# automated E2E tests in B2 are the behavioral evidence. Headless Chromium, two independent contexts.
+date: 2026-09-30T13:13:09Z
+$ ss -ltn | grep -c ':3000 '  (before)
+0
+$ CHAT_DB_PATH=$CLONE/manual-6-1/chat.sqlite setsid npm start > server.log 2>&1 &
+npm pid/pgid: 278563; process group members (pid pgid comm):
+ 278563  278563 npm start
+ 278577  278563 sh
+ 278578  278563 MainThread
+--- server.log so far:
+
+> kostyasabada-chat-capstone@0.0.0 start
+> NODE_ENV=production node --import tsx server.ts
+
+✓ Running next.config took 17ms
+> Ready on http://127.0.0.1:3000 (production)
+
+$ node two-browsers.mjs
+Alice status: Connected
+Alice shows:
+  Alice: Hi Bob, this is Alice (phase B manual session).
+  Bob: Hi Alice, Bob here. Your message arrived.
+  Alice: Great, real-time delivery works in both directions.
+Bob status: Connected
+Bob shows:
+  Alice: Hi Bob, this is Alice (phase B manual session).
+  Bob: Hi Alice, Bob here. Your message arrived.
+  Alice: Great, real-time delivery works in both directions.
+screenshots saved
+[exit 0]
+
+$ kill -TERM -278563  (whole process group)
+[exit 0]
+npm start (wrapper) exit status: 143
+process group members after shutdown: none
+--- server.log (full):
+
+> kostyasabada-chat-capstone@0.0.0 start
+> NODE_ENV=production node --import tsx server.ts
+
+✓ Running next.config took 17ms
+> Ready on http://127.0.0.1:3000 (production)
+> Received SIGTERM, shutting down
+> Server closed
+$ ss -ltn | grep -c ':3000 '  (after)
+0
+$ ls -A $CLONE/manual-6-1
+chat.sqlite
+$ ls -la shots
+total 108
+drwxrwxr-x 2 ksabada ksabada   100 Sep 30 16:13 .
+drwxrwxr-x 3 ksabada ksabada   400 Sep 30 16:13 ..
+-rw-rw-r-- 1 ksabada ksabada 30528 Sep 30 16:13 supplementary-alice.png
+-rw-rw-r-- 1 ksabada ksabada 30520 Sep 30 16:13 supplementary-bob.png
+-rw-rw-r-- 1 ksabada ksabada 42374 Sep 30 16:13 supplementary-two-browsers.png
+# Note: the exit status of the server node process itself was not captured separately; the npm wrapper
+# exited 143 (SIGTERM, as documented in README), both shutdown log lines are present, the group is empty,
+# and port 3000 is free.
+
+## B5 Screenshots copied to the evidence directory; process and port check; clone removed (cleanup.sh; helper exit 0)
+date: 2026-09-30T13:13:33Z
+clone path: /tmp/claude-1000/-home-ksabada-projects-AI-course-2026-agentic-engineering-crash-course-capstone/4034e690-c8bb-4005-a19e-8b3d5038ed0e/scratchpad/clean-6-1
+$ git -C $CLONE rev-parse HEAD
+e4ed36401c70a5664d6ba40e8235b3015d43acdf
+[exit 0]
+$ git -C $CLONE status --short | wc -l
+1
+$ cp shots/supplementary-*.png $EV/
+[exit 0]
+$ sha256sum (shots in scratchpad vs copies)
+cc1d84caf553bf7152876b2219f2eea9fe374c4c042d83bbd354f1aa9aa3a87d  supplementary-alice.png
+306d5d9f76914704b50bdeca218e39f1c291c107009756c5822913504cd49182  supplementary-bob.png
+b8605e8ca848c3f97dec695ac07fa213419c398e51a57effceb3f2a5dcb58563  supplementary-two-browsers.png
+copies identical
+$ bash procs.sh  (before removing the clone)
+no matching processes
+port 3000: no listener
+$ rm -rf $CLONE
+[exit 0]
+$ test -e $CLONE
+[exit 1] (1 = removed)
+$ bash procs.sh  (after)
+no matching processes
+port 3000: no listener
+# The 1 entry in the clone's 'git status --short' at cleanup is attributed to the untracked $CLONE/manual-6-1/
+# directory (the session's CHAT_DB_PATH) created in B4; after B2 the count was 0. The entry was not listed
+# before the clone was removed, so this attribution is inferred.
+
+## B6 Append-only, whitespace, git status, last process check (final.sh; helper exit 0)
+
+### $SP/phaseb/final.sh
+#!/usr/bin/env bash
+# final.sh (task 6.1 phase B): append-only checks against the pre-append copies, whitespace
+# checks (calibrated), git status of the real repo, and a last process/port check.
+set -o pipefail
+SP=/tmp/claude-1000/-home-ksabada-projects-AI-course-2026-agentic-engineering-crash-course-capstone/4034e690-c8bb-4005-a19e-8b3d5038ed0e/scratchpad
+P=$SP/phaseb
+cd /home/ksabada/projects/AI_course/2026-agentic-engineering-crash-course-capstone/submissions/kostyasabada || exit 99
+E=docs/evidence/add-realtime-chat-room-6-1
+echo "date: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+echo '$ calibration: git diff --no-index --check /dev/null <file>  (good file, then a file with a trailing space)'
+git diff --no-index --check /dev/null $P/cal-good.txt; echo "[good: exit $?]"
+git diff --no-index --check /dev/null $P/cal-bad.txt | sed 's/ $/[SPACE]/'; echo "[bad: exit ${PIPESTATUS[0]}] (so 1 = no whitespace error, 3 = error)"
+for f in checks.txt implementation.md; do
+  b=$P/$( [ $f = checks.txt ] && echo checks-before.txt || echo impl-before.md )
+  echo "\$ head -c \$(stat -c %s <pre-append copy>) $E/$f | cmp - <pre-append copy>  (append-only; copy sha256 $(sha256sum < $b | cut -c1-16)...)"
+  head -c $(stat -c %s $b) $E/$f | cmp - $b; echo "[exit ${PIPESTATUS[1]}]"
+done
+echo '$ git status --short'; git status --short; echo "[exit $?]"
+echo '$ git diff --stat'; git diff --stat; echo "[exit $?]"
+echo '$ git diff --check | sed "s/ /[SPACE]/g; s/\r/[CR]/g"  (tracked: checks.txt, implementation.md; checks.txt as of before this section)'
+git diff --check | sed 's/ /[SPACE]/g; s/\r/[CR]/g'; echo "[exit ${PIPESTATUS[0]}]"
+echo '$ untracked files: git ls-files --others --exclude-standard; file --mime'
+git ls-files --others --exclude-standard | while read -r f; do file --mime "$f"; done
+echo "# The untracked files are PNG images (binary), so no per-file text whitespace check applies."
+echo '$ bash procs.sh'; bash $SP/procs.sh
+
+date: 2026-09-30T13:15:35Z
+$ calibration: git diff --no-index --check /dev/null <file>  (good file, then a file with a trailing space)
+[good: exit 1]
+/tmp/claude-1000/-home-ksabada-projects-AI-course-2026-agentic-engineering-crash-course-capstone/4034e690-c8bb-4005-a19e-8b3d5038ed0e/scratchpad/phaseb/cal-bad.txt:1: trailing whitespace.
++bad[SPACE]
+[bad: exit 3] (so 1 = no whitespace error, 3 = error)
+$ head -c $(stat -c %s <pre-append copy>) docs/evidence/add-realtime-chat-room-6-1/checks.txt | cmp - <pre-append copy>  (append-only; copy sha256 31b44f0990130085...)
+[exit 0]
+$ head -c $(stat -c %s <pre-append copy>) docs/evidence/add-realtime-chat-room-6-1/implementation.md | cmp - <pre-append copy>  (append-only; copy sha256 e9e23d1440a54902...)
+[exit 0]
+$ git status --short
+ M docs/evidence/add-realtime-chat-room-6-1/checks.txt
+ M docs/evidence/add-realtime-chat-room-6-1/implementation.md
+?? docs/evidence/add-realtime-chat-room-6-1/supplementary-alice.png
+?? docs/evidence/add-realtime-chat-room-6-1/supplementary-bob.png
+?? docs/evidence/add-realtime-chat-room-6-1/supplementary-two-browsers.png
+[exit 0]
+$ git diff --stat
+ .../evidence/add-realtime-chat-room-6-1/checks.txt | 673 +++++++++++++++++++++
+ .../add-realtime-chat-room-6-1/implementation.md   |  41 ++
+ 2 files changed, 714 insertions(+)
+[exit 0]
+$ git diff --check | sed "s/ /[SPACE]/g; s/\r/[CR]/g"  (tracked: checks.txt, implementation.md; checks.txt as of before this section)
+[exit 0]
+$ untracked files: git ls-files --others --exclude-standard; file --mime
+docs/evidence/add-realtime-chat-room-6-1/supplementary-alice.png: image/png; charset=binary
+docs/evidence/add-realtime-chat-room-6-1/supplementary-bob.png: image/png; charset=binary
+docs/evidence/add-realtime-chat-room-6-1/supplementary-two-browsers.png: image/png; charset=binary
+# The untracked files are PNG images (binary), so no per-file text whitespace check applies.
+$ bash procs.sh
+no matching processes
+port 3000: no listener
+# snapshot.txt (phase B) was generated after this section; its own whitespace check is its last line.
+# END OF PHASE B (maker). checks.txt is final from here; its SHA-256 is stated in snapshot.txt.
