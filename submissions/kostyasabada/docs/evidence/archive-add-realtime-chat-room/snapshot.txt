@@ -1,0 +1,12 @@
+Snapshot: archive-add-realtime-chat-room, step 1: sync
+Base commit: 3812985 (38129856973331ffc11a4ce2b500965e57dd2cf3); files below are untracked changes on top of it.
+Maker: Claude Code general-purpose subagent (maker). Paths are relative to the repository root.
+checks.txt hash is final: taken after its last append; the commands that produced this file and the whitespace recheck of this file are not logged in checks.txt.
+openspec/changes/add-realtime-chat-room/ is unchanged from the base commit.
+
+SHA-256
+aa03de04635151fc333d70c0a486062856e59a532aab4b19ae21136420083efe  submissions/kostyasabada/openspec/specs/agent-loop/spec.md
+764888684a22450f5c723971d0ea88b98bb09e68eb4098a77328a1654ed57a5e  submissions/kostyasabada/openspec/specs/chat-room/spec.md
+ee541d8bb5a945bc2c98e1c5ddb4d57d24045e5c38a8ebee204ddeb8488ea87e  submissions/kostyasabada/openspec/specs/session-context-hook/spec.md
+ca112cdb304f94816de8a28444d31d3a17fcedb795c533c6712335dbe4269641  submissions/kostyasabada/docs/evidence/archive-add-realtime-chat-room/implementation.md
+2874906a6ca0598758672d2e58ae9c5811e89f56ef40c86d18071c35fc17ad47  submissions/kostyasabada/docs/evidence/archive-add-realtime-chat-room/checks.txt
