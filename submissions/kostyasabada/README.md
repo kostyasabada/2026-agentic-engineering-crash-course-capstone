@@ -4,14 +4,14 @@ A small educational capstone chat application built using Agentic Engineering pr
 
 ## Current status
 
-The first OpenSpec change, `add-realtime-chat-room` (one room, a nickname without registration, real-time messages, and a history of the latest 100 messages), is being implemented. Its tooling tasks are in place: pinned dependencies, lint, type check, unit and E2E test commands, the custom Node server (`server.ts`) that serves a placeholder Next.js page and answers the Socket.IO handshake, the agent loop script, and the Claude Code `SessionStart` hook. The chat features themselves (nickname, messages, storage, history) are not implemented yet. Requirements and remaining tasks live in `openspec/changes/add-realtime-chat-room/`; `npm run --silent openspec -- list --json` shows progress.
+The first OpenSpec change, `add-realtime-chat-room`, is implemented: one chat room where people join with a nickname (no registration), exchange messages in real time over Socket.IO, and see the latest 100 messages from SQLite storage, with connection status and catch-up after reconnection. It also adds the tooling: lint, type check, unit and E2E test commands, the agent loop script, and the Claude Code `SessionStart` hook. The final verification from a clean checkout is task 6.1. Requirements and tasks live in `openspec/changes/add-realtime-chat-room/`; `npm run --silent openspec -- list --json` shows progress. Known limitations and deferred follow-ups are in `docs/architecture.md`.
 
 ## Documentation
 
 - `AGENTS.md` — concise rules and a context map.
 - `docs/workflow.md` — working with OpenSpec, the agent loop, and the session context hook.
 - `docs/architecture.md` — project organization and technical decisions.
-- `docs/testing.md` — check and test commands.
+- `docs/testing.md` — check and test commands, and current test coverage.
 - `docs/evidence/` — factual records of work.
 
 Run all project commands from this directory. Leave course files at the repository root unchanged.

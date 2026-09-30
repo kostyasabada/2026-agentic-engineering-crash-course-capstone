@@ -21,22 +21,32 @@
 
 ## Implementation status
 
-Confirmed proposals of `add-realtime-chat-room` (design references in parentheses) that exist after tasks 1.1–1.5:
+Tasks 1.1–5.5 of `add-realtime-chat-room` are implemented; task 6.1 is the final verification from a clean checkout (`evidence/add-realtime-chat-room-6-1/`). Design references in parentheses; requirements are in `openspec/changes/add-realtime-chat-room/specs/`.
 
-- Pinned dependencies at the accepted versions, including TypeScript 6.0.3, ESLint 9.39.5, and `better-sqlite3` 13.0.3 (D1, P1, P4, P5, P6, P9, P11).
-- `tsconfig.json` (strict), `eslint.config.mjs` with the layer-boundary `no-restricted-imports` rules, `vitest.config.ts`, and `playwright.config.ts` (P2, P12, P13, P15, D4).
-- The custom server `server.ts`: Next.js App Router with a placeholder page (`src/app/`), Socket.IO attached with `destroyUpgrade: false`, explicit request and upgrade dispatchers, and environment parsing in `src/server/config.ts` (P3, P5, P6).
-- The npm scripts, including `check` and `check:loop` (P14, P21); commands are in `testing.md`.
-- The agent loop `scripts/agent-loop.sh` with its Vitest suite (P16, P17, P22) and the `SessionStart` hook `scripts/session-context.sh` registered in `.claude/settings.json` (P18); usage is in `workflow.md`.
-
-Not implemented yet (later tasks of the change): the shared schema `src/lib/chat/`, the SQLite repository, chat service, and controller under `src/server/chat/`, the composition root `src/server/app.ts` with the Host/Origin checks (P19, P23), and the chat UI. `server.ts` is reduced to a thin entry when `app.ts` is added.
+- Tooling: pinned dependencies at the accepted versions, including TypeScript 6.0.3, ESLint 9.39.5, and `better-sqlite3` 13.0.3 (D1, P1, P4, P5, P6, P9, P11); `tsconfig.json` (strict), `eslint.config.mjs` with the layer-boundary `no-restricted-imports` rules, `vitest.config.ts`, and `playwright.config.ts` (P2, P12, P13, P15, D4); the npm scripts, including `check` and `check:loop` (P14, P21); `dev` and `start` run the server with `node --import tsx server.ts` directly, and `check` and `check:loop` do so through the E2E fixture (task 4.3); commands and test coverage are in `testing.md`.
+- Agent tooling: the agent loop `scripts/agent-loop.sh` (P16, P17, P22; task 2.1 ran through it) and the `SessionStart` hook `scripts/session-context.sh` registered in `.claude/settings.json` (P18); usage is in `workflow.md`.
+- Shared schema `src/lib/chat/schema.ts`: nickname and message rules used by the client and the server, including lone-surrogate rejection (D2, tasks 2.1–2.2).
+- Server layers (D3, D4, P23): `src/server/db/sqlite.ts` and `src/server/chat/message.repository.ts` (SQLite storage), `src/server/chat/chat.service.ts` (storing messages with a server-assigned `createdAt`, history rules), `src/server/chat/chat.controller.ts` (Socket.IO events, payload validation with the shared schema, acknowledgements), and `src/server/http/host-policy.ts` (Host/Origin allowlist, P19).
+- Composition root `src/server/app.ts` (`createApp`: HTTP server, Socket.IO with `destroyUpgrade: false`, request and upgrade dispatchers with the Host check, Origin check at the handshake, `close()`), and the thin entry `server.ts` (environment parsing in `src/server/config.ts`, Next.js App Router, listen, graceful shutdown on `SIGINT`/`SIGTERM`) (D2, D4, P3, P5, P6).
+- Chat UI in `src/app/_chat/`: nickname form, message list, composer, connection status, and the `use-chat-socket.ts` hook with `merge-messages.ts` and `send-ack.ts` (tasks 5.1–5.5).
 
 ## Limitations
 
 - In-process Socket.IO broadcast works for one server instance only; a custom server loses some automatic Next.js optimizations and needs a long-running Node process.
+- A supervisor that signals only npm's PID (for example `npm start` as a container's PID 1) does not reach the server; signal the process group or run `node --import tsx server.ts` directly (task 4.3; `README.md`).
+- In dev mode (`npm run dev`), the Next.js HMR client reloads the page when the dev server restarts, so a typed but unsent message is lost in dev mode only (task 5.3; `testing.md`).
+- Host/Origin residual risks accepted for a local unauthenticated demo: local non-browser processes can connect with an allowlisted `Host`, other machines are refused unless `HOST` names that address, and only plain HTTP is served (design D2).
+- After a database reset, a stale client `lastSeenId` is detected only while the new highest id stays below it (design, Risks / Trade-offs, review finding R2-3).
 - `better-sqlite3` is a native addon and may need a C++ toolchain where no prebuilt binary matches.
 - The layered layout adds more structure than a one-room chat needs (accepted trade-off).
 - The Codex fixer (`codex exec`) and Codex session context are unverified because Codex is not installed here (`workflow.md`).
+
+## Open items
+
+Deferred follow-ups, not scheduled as tasks of the change:
+
+- No ESLint rule prevents `src/server/app.ts` from importing `next`; today no file under `src/server/` imports it; `server.ts` does (task 4.2, maker open point 6, deferred to a separate task).
+- The agent loop's `changed_files` log field lists every untracked non-ignored file, not only files created or changed by the fixer run (task 2.1 review finding 4, deferred by user decision).
 
 ## Open decisions
 

@@ -29,17 +29,37 @@ Dev mode and server restarts: with `npm run dev`, the Next.js HMR client reloads
 
 Agent-driven browser checks and screenshots (for example, the Codex `playwright` skill or the Claude Code browser) are supplementary manual checks, not a substitute for the automated tests.
 
-## Current and planned coverage
+## Current coverage
 
-Current tests: server configuration parsing (`src/server/config.test.ts`), the agent loop (`scripts/agent-loop.test.ts`), and two E2E tests (`e2e/smoke.spec.ts`: the page and the Socket.IO handshake are served by the custom server; `e2e/startup.spec.ts`: the server exits with code 1 when its port is in use).
+Counts from a run at commit `e5c9a22` (2026-09-30, Node 24.21.0; `npx vitest run --reporter=verbose` and `npx playwright test --list`, recorded in `evidence/add-realtime-chat-room-6-1/checks.txt`). The expected behavior of each case is in the OpenSpec specs; this list only says where it is checked.
 
-Planned with the chat features (tasks 2–5 of the change add the tests):
+Unit and Node integration tests (Vitest, 10 files, 465 tests):
 
-- A message sent by one user is received by another independent client.
-- History survives a server restart.
-- Empty and oversized messages are rejected according to the specification.
-- Connection loss is visible to the user; reconnection is checked separately.
-- A new client receives the agreed number of recent messages in the correct order.
+| File | Tests | Covers |
+|---|---:|---|
+| `src/server/config.test.ts` | 23 | `PORT`/`HOST`/`CHAT_DB_PATH` parsing and invalid values; IPv6 bracketing of the host in URLs. |
+| `src/lib/chat/schema.test.ts` | 108 | Shared nickname and message rules: limits, trimming, allowed characters, UTF-16 counting, lone surrogates. |
+| `src/server/chat/message.repository.test.ts` | 13 | SQLite repository: `openDatabase`, id order and no reuse, `latest`/`since`, persistence across reopen. |
+| `src/server/chat/chat.service.test.ts` | 31 | Chat service with an in-memory repository and injected clock: `postMessage`, `historyFor` `replace`/`append` rules. |
+| `src/server/chat/chat.controller.test.ts` | 53 | Socket.IO controller on an ephemeral port: history on connect, broadcast and order, payload rejection, `server_error` on service failure. |
+| `src/server/http/host-policy.test.ts` | 116 | Host/Origin allowlist: construction, host normalization, IPv4 shorthand, `isAllowedHost`, `isAllowedOrigin`. |
+| `src/server/app.test.ts` | 43 | Composition root with stub Next.js handlers: Host check on requests, Host/Origin at the handshake on both transports, upgrade dispatch, `close()`. |
+| `src/app/_chat/merge-messages.test.ts` | 12 | Client message list: merge, dedupe, ordering by id, history `replace`/`append`, `lastSeenId`. |
+| `src/app/_chat/send-ack.test.ts` | 19 | Client parsing of send acknowledgements, including malformed ones. |
+| `scripts/agent-loop.test.ts` | 47 | Agent loop with fake agents: usage errors, iterations, stop reasons, interrupt, run log, nested Git repository. |
+
+E2E tests (Playwright, Chromium, 8 files, 52 tests):
+
+| File | Tests | Covers |
+|---|---:|---|
+| `e2e/smoke.spec.ts` | 1 | The custom server serves the chat page and answers the Socket.IO polling handshake. |
+| `e2e/startup.spec.ts` | 1 | The server exits with code 1 when its port is in use. |
+| `e2e/shutdown.spec.ts` | 3 | Graceful shutdown on `SIGTERM` and `SIGINT` keeps stored messages; prompt shutdown with an unfinished request. |
+| `e2e/host-policy.spec.ts` | 2 | The real server refuses a foreign `Host` and closes upgrades nobody owns. |
+| `e2e/nickname.spec.ts` | 12 | Nickname entry, validation messages, reload, change, duplicates, unavailable `localStorage`. |
+| `e2e/messaging.spec.ts` | 19 | Delivery between independent contexts, order, plain-text rendering, message limits, local `HH:MM` timestamps, nickname attribution and change (including duplicates), rejected and unconfirmed sends, foreign `Origin`. |
+| `e2e/connection.spec.ts` | 5 | Connection status, reconnection without reload, catch-up without duplicates, stale `lastSeenId`, server-ended session. |
+| `e2e/history.spec.ts` | 9 | Latest 100 of 105 messages, auto-scroll rules (including the own accepted message), empty-room hint, history after restart. |
 
 ## Reporting
 

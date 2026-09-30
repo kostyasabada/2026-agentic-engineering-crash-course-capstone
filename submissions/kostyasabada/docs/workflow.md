@@ -59,7 +59,7 @@ Documentation: https://github.com/Fission-AI/OpenSpec.
 scripts/agent-loop.sh --task-id <task-id> --brief docs/evidence/<task-id>/loop-brief.md [--agent claude|codex] [--max-iterations N] [--agent-timeout SECONDS]
 ```
 
-Requirements: `openspec/changes/add-realtime-chat-room/specs/agent-loop/spec.md`; interface, permissions, stop reasons, and log format: design D7. Task 2.1 is planned as the first real task run through the loop.
+Requirements: `openspec/changes/add-realtime-chat-room/specs/agent-loop/spec.md`; interface, permissions, stop reasons, and log format: design D7. Task 2.1 was the first real task run through the loop (`docs/evidence/add-realtime-chat-room-2-1/loop-run.log`, stop reason `checks_passed` after one fixer run).
 
 ## Session context hook
 
