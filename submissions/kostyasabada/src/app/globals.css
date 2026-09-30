@@ -2,12 +2,16 @@
   color-scheme: light dark;
   --error: #b3261e;
   --muted: #5f6368;
+  --ok: #1e7b34;
+  --warn: #8a5a00;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --error: #f2b8b5;
     --muted: #a8adb3;
+    --ok: #8fd19e;
+    --warn: #f5c56b;
   }
 }
 
@@ -69,6 +73,34 @@ button {
 textarea {
   font: inherit;
   padding: 0.35rem 0.6rem;
+}
+
+/* Connection status (design D2): the label is the text; the dot only repeats it. */
+.connection-status {
+  margin: 0.75rem 0 0;
+  font-weight: 600;
+}
+
+.connection-status::before {
+  content: '';
+  display: inline-block;
+  width: 0.6rem;
+  height: 0.6rem;
+  margin-right: 0.4rem;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.connection-status[data-status='connected'] {
+  color: var(--ok);
+}
+
+.connection-status[data-status='reconnecting'] {
+  color: var(--warn);
+}
+
+.connection-status[data-status='disconnected'] {
+  color: var(--error);
 }
 
 .message-list {

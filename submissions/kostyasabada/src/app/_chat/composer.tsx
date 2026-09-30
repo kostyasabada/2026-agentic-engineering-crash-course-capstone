@@ -4,6 +4,9 @@ import { useId, useRef, useState, type FormEvent, type KeyboardEvent } from 'rea
 import { MESSAGE_MAX_LENGTH, messageTextSchema } from '../../lib/chat/schema'
 import type { SendResult } from './use-chat-socket'
 
+/** Shown if `onSend` throws (it should not; the composer must never stay pending). */
+const UNEXPECTED_SEND_ERROR = 'Message not sent: an unexpected error occurred.'
+
 type ComposerProps = {
   /** The current nickname; read when a message is sent, so a change applies to later messages. */
   nickname: string
@@ -46,9 +49,16 @@ export function Composer({ nickname, connected, onSend }: ComposerProps) {
     sendingRef.current = true
     setSending(true)
     const sentValue = value
-    const outcome = await onSend(nickname, result.data)
-    sendingRef.current = false
-    setSending(false)
+    let outcome: SendResult
+    try {
+      outcome = await onSend(nickname, result.data)
+    } catch {
+      outcome = { ok: false, error: UNEXPECTED_SEND_ERROR }
+    } finally {
+      // Always leave the pending state, so Send is enabled again (review finding F2 of 5.2).
+      sendingRef.current = false
+      setSending(false)
+    }
     if (outcome.ok) {
       // Keep anything typed while the send was in flight.
       setValue((current) => (current === sentValue ? '' : current))

@@ -3,6 +3,7 @@
 import { useState, useSyncExternalStore } from 'react'
 import { nicknameSchema } from '../../lib/chat/schema'
 import { Composer } from './composer'
+import { ConnectionStatus } from './connection-status'
 import { MessageList } from './message-list'
 import { NicknameForm } from './nickname-form'
 import { useChatSocket } from './use-chat-socket'
@@ -99,6 +100,7 @@ export function ChatRoom() {
           </button>
         </div>
       )}
+      <ConnectionStatus status={chat.status} />
       <MessageList messages={chat.messages} />
       <Composer nickname={nickname} connected={chat.connected} onSend={chat.send} />
     </section>

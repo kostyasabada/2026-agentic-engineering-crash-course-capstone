@@ -1,0 +1,25 @@
+# Snapshot for add-realtime-chat-room-5-3 (revision 2)
+base_commit: a9a2f0e
+paths relative to the repository root; sha256sum output; nothing staged or committed; snapshot.txt, implementation.md, and checks.txt are evidence reports and not part of the hashed deliverables (the final checks.txt hash is stated at the end)
+
+## Deliverables
+6916434961c9af74a8231812106fe758fba38153d2e71d90d8f360dd8a0eaa36  submissions/kostyasabada/src/app/_chat/use-chat-socket.ts
+4f6eb4b3fd96325b729b60cab3995d65593c858aec421c637d41edb760e5f602  submissions/kostyasabada/src/app/_chat/send-ack.ts
+9f2205cd698f5fe0b7e40142c35caad44fa34c3d53c77878a0bf14a3e9b89795  submissions/kostyasabada/src/app/_chat/send-ack.test.ts
+615ccc037ea509e153f128c655263975031bf17cb28126ce3e129a8242a72f4b  submissions/kostyasabada/src/app/_chat/connection-status.tsx
+5942b1e49207a788a1e866b5c162b93fba8b2a05b273935359a57908b5441179  submissions/kostyasabada/src/app/_chat/composer.tsx
+531dd3a7d95d6b6f1359b24e3e145f6f1648e5d4c56ac4a61366bf25e244b170  submissions/kostyasabada/src/app/_chat/chat-room.tsx
+3b93a2a0ba05dab717f2a0f036457d3b1c6bc66a16790f249861ca3fe9dbdde7  submissions/kostyasabada/src/app/globals.css
+f8eeb74e2a8d9e12965636b4ec0cc2204bb4d768d7467728869d999bbabbb7a6  submissions/kostyasabada/e2e/connection.spec.ts
+dc5fcf23458eb295290e745988041b17c465a799d4fa5d03fced99cbc8b65a27  submissions/kostyasabada/e2e/messaging.spec.ts
+e67fb43cccd2cacfcb7b8ddd8adba8386619e8558fd6e43d86cefea392c68461  submissions/kostyasabada/e2e/fixtures/chat-server.ts
+1805a7666b03d7f7cc2cc87aaa0c2cb34536f5ffc641a6664e6f5da73686a652  submissions/kostyasabada/docs/testing.md
+
+## Supplementary screenshots
+b9454eb4127c833612ad915492620f6599b24f9ecdf175674b60628b177d61fd  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-5-3/status-connected.png
+5913a21e4231c2004dc4e2dd402f3056eeff85be8378050b35848359a84a05df  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-5-3/status-reconnecting.png
+19c7bd2a43e4d6510ed2308d61bced7440cb6e014c1524c520d3e1fb1d1993f3  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-5-3/status-connected-after-restart.png
+f2a1925bfdc62eabdd7314eca6ee9a19987ff6b971c3b7188d6754c2954a5c63  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-5-3/status-disconnected.png
+
+## Evidence log
+checks.txt (final, after the round-2 final entry; not re-hashed inside itself): ce8f9960b406062bf8dfbbf16c31fc519cb60b5ddda8d3dd7ac4fb428fc55336  submissions/kostyasabada/docs/evidence/add-realtime-chat-room-5-3/checks.txt

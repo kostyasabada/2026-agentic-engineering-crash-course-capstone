@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { io, type Socket } from 'socket.io-client'
 import type { ChatMessage } from '../../lib/chat/schema'
 import { applyHistory, lastSeenIdOf, mergeMessages, type HistoryEvent } from './merge-messages'
+import { readSendAck } from './send-ack'
 
 /** Acknowledgement timeout of `message:send` (design D2). */
 export const SEND_TIMEOUT_MS = 5_000
@@ -11,10 +12,8 @@ export const SEND_TIMEOUT_MS = 5_000
 /** Upper bound of Socket.IO's reconnection backoff (design D2, Q5). */
 const RECONNECTION_DELAY_MAX_MS = 2_000
 
-/** Ack of `message:send` as sent by the server (design D2 contract). */
-type SendAck =
-  | { ok: true; message: ChatMessage }
-  | { ok: false; error: { code: 'invalid_nickname' | 'invalid_text' | 'server_error'; message: string } }
+/** Connection state shown to the person (chat-room spec, design D2 and Q5); the exact label texts. */
+export type ConnectionStatus = 'Connected' | 'Reconnecting' | 'Disconnected'
 
 /** Outcome of a send for the composer: on failure, a message to show (the text is kept). */
 export type SendResult = { ok: true } | { ok: false; error: string }
@@ -22,7 +21,9 @@ export type SendResult = { ok: true } | { ok: false; error: string }
 export type ChatSocket = {
   /** Messages ordered by server id, oldest first, each id once. */
   messages: ChatMessage[]
-  /** Whether the socket is connected; sending is possible only then. */
+  /** The current connection status. */
+  status: ConnectionStatus
+  /** Whether the socket is connected (`status === 'Connected'`); sending is possible only then. */
   connected: boolean
   /** Sends `{ nickname, text }` and resolves when the server acknowledges it or the timeout passes. */
   send: (nickname: string, text: string) => Promise<SendResult>
@@ -39,12 +40,24 @@ const TIMED_OUT = `Message not sent: the server did not confirm it within ${SEND
  *   once even if the broadcast and the ack both arrive.
  * - The handshake `auth` is a function, so every reconnection sends the current highest
  *   id as `lastSeenId` and receives only the missed messages.
- * - Task 5.3 extends `connected` to the Connected / Reconnecting / Disconnected status
- *   from the manager's reconnect events; the listeners are registered here.
+ * - Status (design D2): `connect` → `Connected`. On `disconnect`, `socket.active` tells
+ *   whether socket.io-client will reconnect by itself: yes (`transport close`, `ping
+ *   timeout`, e.g. a stopped server) → `Reconnecting`; no (`io server disconnect`, a
+ *   session ended by the server) → `Disconnected`, terminal until the page is reloaded,
+ *   because D2 maps "reconnection not attempted" to `Disconnected` and the server ends a
+ *   session only deliberately (its controller closes the transport instead, so its clients
+ *   reconnect). The manager's `reconnect_attempt` → `Reconnecting` (also while the first
+ *   connection is retried) and `reconnect_failed` (attempts exhausted; with the default
+ *   unlimited attempts this does not happen) → `Disconnected`; a `connect_error` after which
+ *   the socket is no longer active (a server middleware refused it) → `Disconnected`.
+ *   Before the first connection the status is `Disconnected`. The manager listeners are
+ *   registered and removed in the same effect as the socket's.
+ * - Reconnection uses Socket.IO's backoff, capped at 2 s (`reconnectionDelayMax`, design
+ *   D2 and Q5); nothing is queued while offline (the composer disables sending).
  */
 export function useChatSocket(): ChatSocket {
   const [messages, setMessages] = useState<ChatMessage[]>([])
-  const [connected, setConnected] = useState(false)
+  const [status, setStatus] = useState<ConnectionStatus>('Disconnected')
   const socketRef = useRef<Socket | null>(null)
   const lastSeenIdRef = useRef<number | undefined>(undefined)
 
@@ -62,13 +75,23 @@ export function useChatSocket(): ChatSocket {
       reconnectionDelayMax: RECONNECTION_DELAY_MAX_MS,
     })
     socketRef.current = socket
-    socket.on('connect', () => setConnected(true))
-    socket.on('disconnect', () => setConnected(false))
+    const manager = socket.io
+    const onReconnectAttempt = () => setStatus('Reconnecting')
+    const onReconnectFailed = () => setStatus('Disconnected')
+    socket.on('connect', () => setStatus('Connected'))
+    socket.on('disconnect', () => setStatus(socket.active ? 'Reconnecting' : 'Disconnected'))
+    socket.on('connect_error', () => {
+      if (!socket.active) setStatus('Disconnected')
+    })
+    manager.on('reconnect_attempt', onReconnectAttempt)
+    manager.on('reconnect_failed', onReconnectFailed)
     socket.on('history', (history: HistoryEvent) => setMessages((current) => applyHistory(current, history)))
     socket.on('message:new', (message: ChatMessage) => setMessages((current) => mergeMessages(current, [message])))
     return () => {
       socketRef.current = null
       socket.removeAllListeners()
+      manager.off('reconnect_attempt', onReconnectAttempt)
+      manager.off('reconnect_failed', onReconnectFailed)
       socket.disconnect()
     }
   }, [])
@@ -76,16 +99,18 @@ export function useChatSocket(): ChatSocket {
   const send = useCallback(async (nickname: string, text: string): Promise<SendResult> => {
     const socket = socketRef.current
     if (!socket?.connected) return { ok: false, error: NOT_CONNECTED }
-    let ack: SendAck
+    let rawAck: unknown
     try {
-      ack = await socket.timeout(SEND_TIMEOUT_MS).emitWithAck('message:send', { nickname, text })
+      rawAck = await socket.timeout(SEND_TIMEOUT_MS).emitWithAck('message:send', { nickname, text })
     } catch {
       return { ok: false, error: TIMED_OUT }
     }
-    if (!ack.ok) return { ok: false, error: `Message not sent: ${ack.error.message}` }
+    // The ack is untrusted input: a malformed one is a failure, never an exception.
+    const ack = readSendAck(rawAck)
+    if (!ack.ok) return ack
     setMessages((current) => mergeMessages(current, [ack.message]))
     return { ok: true }
   }, [])
 
-  return { messages, connected, send }
+  return { messages, status, connected: status === 'Connected', send }
 }

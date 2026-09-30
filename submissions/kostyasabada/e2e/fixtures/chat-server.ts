@@ -18,6 +18,12 @@ export interface ChatServer {
   start(): Promise<void>
   /** Stops the server process and waits for it to exit. */
   stop(): Promise<void>
+  /**
+   * Deletes the database file and its `-wal`/`-shm` files while the server is stopped, so
+   * the next start() creates an empty database (a reset database, e.g. for seeding fewer
+   * messages than a browser has already seen). Throws while the server is running.
+   */
+  resetDatabase(): Promise<void>
 }
 
 const PROJECT_DIR = path.resolve(__dirname, '../..')
@@ -133,6 +139,11 @@ export class ChatServerProcess implements ChatServer {
       signalGroup(group, 'SIGKILL')
       await groupExited(group, STOP_TIMEOUT_MS)
     }
+  }
+
+  async resetDatabase(): Promise<void> {
+    if (this.child) throw new Error('stop the chat server before resetting its database')
+    await Promise.all(['', '-wal', '-shm'].map((suffix) => rm(`${this.dbPath}${suffix}`, { force: true })))
   }
 
   /** Last resort if the test process exits without running stop(). */

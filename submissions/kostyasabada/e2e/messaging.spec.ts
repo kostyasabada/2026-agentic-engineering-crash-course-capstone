@@ -514,6 +514,65 @@ test('a send that is not confirmed within 5 seconds shows the error and keeps th
   await expectMessages(a, [])
 })
 
+/**
+ * Routes the page's Socket.IO WebSocket through the test and passes every acknowledgement
+ * packet the server sends to the page (`43<ack id>[...]`) through `onAck`, which returns the
+ * packet to deliver instead (review finding F2 of task 5.2: a malformed ack).
+ */
+async function routeAcks(page: Page, onAck: (packet: string) => string): Promise<() => boolean> {
+  let upgraded = false
+  await page.routeWebSocket(/\/socket\.io\//, (ws) => {
+    const server = ws.connectToServer()
+    ws.onMessage((message) => {
+      if (message === '5') upgraded = true
+      server.send(message)
+    })
+    server.onMessage((message) => ws.send(typeof message === 'string' && /^43\d+\[/.test(message) ? onAck(message) : message))
+  })
+  return () => upgraded
+}
+
+test('a malformed acknowledgement shows an error, keeps the text, and re-enables sending', async ({
+  browser,
+  baseURL,
+}) => {
+  // Each attempt reaches the real server, which stores and broadcasts the message; only
+  // the ack that comes back is replaced. So the client cannot tell whether the message was
+  // accepted: it says so, keeps the text, and the broadcast still shows the stored message.
+  let replacement: string | undefined
+  let isUpgraded: () => boolean = () => false
+  const a = await openClient(browser, baseURL!, 'A', {}, async (page) => {
+    isUpgraded = await routeAcks(page, (packet) =>
+      replacement === undefined ? packet : packet.replace(/^(43\d+)\[[\s\S]*\]$/, `$1${replacement}`),
+    )
+  })
+  await join(a, 'Alice')
+  await expect(sendButton(a)).toBeEnabled()
+  await expect.poll(isUpgraded).toBe(true)
+
+  const malformed = ['["not an ack"]', '[null]', '[{"ok":true}]', '[{"ok":false}]', '[{"ok":true,"message":{"id":"1"}}]']
+  const shown: Shown[] = []
+  for (const [index, ack] of malformed.entries()) {
+    replacement = ack
+    const text = `attempt ${index + 1}`
+    await messageInput(a).fill(text)
+    await messageInput(a).press('Enter')
+    await expect(composerAlerts(a)).toHaveText(['Message not confirmed: the server sent an invalid response.'])
+    await expect(messageInput(a)).toHaveValue(text)
+    await expect(sendButton(a)).toBeEnabled()
+    shown.push({ nickname: 'Alice', text })
+    await expectMessages(a, shown)
+  }
+
+  // A well-formed ack again: the send succeeds, the error disappears, the input is cleared.
+  replacement = undefined
+  await messageInput(a).fill('confirmed')
+  await messageInput(a).press('Enter')
+  await expect(messageInput(a)).toHaveValue('')
+  await expect(composerAlerts(a)).toHaveCount(0)
+  await expectMessages(a, [...shown, { nickname: 'Alice', text: 'confirmed' }])
+})
+
 // ---- Message clauses of the nickname requirement (deferred from task 5.1).
 
 test('a valid trimmed nickname enables the message input and attributes messages to it', async ({
