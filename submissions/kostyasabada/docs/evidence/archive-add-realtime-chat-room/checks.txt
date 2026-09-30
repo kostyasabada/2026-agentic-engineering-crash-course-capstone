@@ -909,3 +909,251 @@ openspec/specs/agent-loop/spec.md rc=1
 openspec/specs/chat-room/spec.md rc=1
 openspec/specs/session-context-hook/spec.md rc=1
 [exit code: 0]
+
+=== STEP 2 (move) — begins here. Helper body (unchanged from step 1 final)
+$ cat /tmp/claude-1000/-home-ksabada-projects-AI-course-2026-agentic-engineering-crash-course-capstone/4034e690-c8bb-4005-a19e-8b3d5038ed0e/scratchpad/run.sh
+#!/usr/bin/env bash
+# Usage: run.sh <label> <command string>
+# Runs the command with bash -o pipefail from the submission dir, appends the
+# command, its combined output (trailing spaces/tabs and CR made visible as
+# [SPACE]/[TAB]/[CR]; nothing stripped), and the measured exit code to
+# checks.txt. Also prints the same to stdout.
+set -u
+SUB=/home/ksabada/projects/AI_course/2026-agentic-engineering-crash-course-capstone/submissions/kostyasabada
+LOG=$SUB/docs/evidence/archive-add-realtime-chat-room/checks.txt
+label=$1; cmd=$2
+mkdir -p "$(dirname "$LOG")"
+out=$(cd "$SUB" && PATH=$HOME/.nvm/versions/node/v24.21.0/bin:$PATH OPENSPEC_TELEMETRY=0 bash -o pipefail -c "$cmd" 2>&1; echo "__RC__=$?")
+rc=${out##*__RC__=}
+out=${out%__RC__=*}
+out=${out%$'\n'}
+marked=$(printf '%s' "$out" | perl -pe 's/([ \t]*)(\r?)$/join("", map { $_ eq " " ? "[SPACE]" : "[TAB]" } split(\/\/, $1)) . ($2 ? "[CR]" : "")/e; s/\r/[CR]/g')
+# Entries are separated by one blank line written before each entry, so the
+# log never ends with a blank line.
+{
+  [ -s "$LOG" ] && printf '\n'
+  printf '=== %s\n$ %s\n' "$label" "$cmd"
+  [ -n "$marked" ] && printf '%s\n' "$marked"
+  printf '[exit code: %s]\n' "$rc"
+} | tee -a "$LOG"
+[exit code: 0]
+
+=== STEP 2 precondition: environment and HEAD
+$ node --version; git rev-parse HEAD; git log --oneline -1
+v24.21.0
+a0d8abdb5a28090d964fbc1a2b46de7648f9a83f
+a0d8abd spec: sync add-realtime-chat-room requirements into main specs (archive step 1)
+[exit code: 0]
+
+=== STEP 2 precondition: main-spec hashes from committed snapshot.txt (step 1)
+$ sed -n 's|  submissions/kostyasabada/openspec/specs/|  openspec/specs/|p' docs/evidence/archive-add-realtime-chat-room/snapshot.txt | grep '  openspec/specs/' | tee /dev/stderr | sha256sum -c
+aa03de04635151fc333d70c0a486062856e59a532aab4b19ae21136420083efe  openspec/specs/agent-loop/spec.md
+764888684a22450f5c723971d0ea88b98bb09e68eb4098a77328a1654ed57a5e  openspec/specs/chat-room/spec.md
+ee541d8bb5a945bc2c98e1c5ddb4d57d24045e5c38a8ebee204ddeb8488ea87e  openspec/specs/session-context-hook/spec.md
+openspec/specs/agent-loop/spec.md: OK
+openspec/specs/chat-room/spec.md: OK
+openspec/specs/session-context-hook/spec.md: OK
+[exit code: 0]
+
+=== STEP 2 precondition: change dir unchanged and tree clean
+$ git diff --exit-code HEAD -- openspec/changes && echo "openspec/changes: no diff"; s=$(git status --short --untracked-files=all); echo "status: [$s]"; [ -z "$s" ]
+openspec/changes: no diff
+status: [ M docs/evidence/archive-add-realtime-chat-room/checks.txt]
+[exit code: 1]
+
+=== STEP 2 precondition note: the only change is this step's own appends to checks.txt (HEAD version must be an exact prefix of the working file; nothing else modified or untracked)
+$ f=docs/evidence/archive-add-realtime-chat-room/checks.txt; n=$(git show HEAD:submissions/kostyasabada/$f | wc -c); echo "HEAD bytes=$n working bytes=$(wc -c < $f)"; cmp -n $n <(git show HEAD:submissions/kostyasabada/$f) $f && echo "HEAD checks.txt is an exact prefix (append-only)"; o=$(git status --short --untracked-files=all | grep -v "^ M $f\$"); echo "other changes: [$o]"; [ -z "$o" ]
+HEAD bytes=56524 working bytes=59295
+HEAD checks.txt is an exact prefix (append-only)
+other changes: []
+[exit code: 0]
+
+=== STEP 2 command: archive (default: no --skip-specs, no --no-validate)
+$ OPENSPEC_TELEMETRY=0 npm run --silent openspec -- archive add-realtime-chat-room --yes
+
+Proposal warnings in proposal.md (non-blocking):
+  ⚠ Consider splitting changes with more than 10 deltas
+Task status: ✓ Complete
+
+Specs to update:
+  agent-loop: update
+  chat-room: update
+  session-context-hook: update
+Totals: + 0, ~ 0, - 0, → 0
+Specs already in sync; no files changed.
+Change 'add-realtime-chat-room' archived as '2026-09-30-add-realtime-chat-room'.
+[exit code: 0]
+
+=== STEP 2 after: main-spec hashes unchanged
+$ sed -n 's|  submissions/kostyasabada/openspec/specs/|  openspec/specs/|p' docs/evidence/archive-add-realtime-chat-room/snapshot.txt | grep '  openspec/specs/' | sha256sum -c; git diff --exit-code HEAD -- openspec/specs && echo 'openspec/specs: no diff vs HEAD'
+openspec/specs/agent-loop/spec.md: OK
+openspec/specs/chat-room/spec.md: OK
+openspec/specs/session-context-hook/spec.md: OK
+openspec/specs: no diff vs HEAD
+[exit code: 0]
+
+=== STEP 2 after: working-tree state (no git add -N)
+$ git status --short --untracked-files=all; echo "--- porcelain:"; git status --porcelain --untracked-files=all; echo "--- diff --stat -M HEAD:"; git diff --stat -M HEAD; echo "--- index:"; git diff --cached --quiet && echo "nothing staged"; ls -A openspec/changes openspec/changes/archive
+ M docs/evidence/archive-add-realtime-chat-room/checks.txt
+ D openspec/changes/add-realtime-chat-room/.openspec.yaml
+ D openspec/changes/add-realtime-chat-room/design.md
+ D openspec/changes/add-realtime-chat-room/proposal.md
+ D openspec/changes/add-realtime-chat-room/specs/agent-loop/spec.md
+ D openspec/changes/add-realtime-chat-room/specs/chat-room/spec.md
+ D openspec/changes/add-realtime-chat-room/specs/session-context-hook/spec.md
+ D openspec/changes/add-realtime-chat-room/tasks.md
+?? openspec/changes/archive/2026-09-30-add-realtime-chat-room/.openspec.yaml
+?? openspec/changes/archive/2026-09-30-add-realtime-chat-room/design.md
+?? openspec/changes/archive/2026-09-30-add-realtime-chat-room/proposal.md
+?? openspec/changes/archive/2026-09-30-add-realtime-chat-room/specs/agent-loop/spec.md
+?? openspec/changes/archive/2026-09-30-add-realtime-chat-room/specs/chat-room/spec.md
+?? openspec/changes/archive/2026-09-30-add-realtime-chat-room/specs/session-context-hook/spec.md
+?? openspec/changes/archive/2026-09-30-add-realtime-chat-room/tasks.md
+--- porcelain:
+ M submissions/kostyasabada/docs/evidence/archive-add-realtime-chat-room/checks.txt
+ D submissions/kostyasabada/openspec/changes/add-realtime-chat-room/.openspec.yaml
+ D submissions/kostyasabada/openspec/changes/add-realtime-chat-room/design.md
+ D submissions/kostyasabada/openspec/changes/add-realtime-chat-room/proposal.md
+ D submissions/kostyasabada/openspec/changes/add-realtime-chat-room/specs/agent-loop/spec.md
+ D submissions/kostyasabada/openspec/changes/add-realtime-chat-room/specs/chat-room/spec.md
+ D submissions/kostyasabada/openspec/changes/add-realtime-chat-room/specs/session-context-hook/spec.md
+ D submissions/kostyasabada/openspec/changes/add-realtime-chat-room/tasks.md
+?? submissions/kostyasabada/openspec/changes/archive/2026-09-30-add-realtime-chat-room/.openspec.yaml
+?? submissions/kostyasabada/openspec/changes/archive/2026-09-30-add-realtime-chat-room/design.md
+?? submissions/kostyasabada/openspec/changes/archive/2026-09-30-add-realtime-chat-room/proposal.md
+?? submissions/kostyasabada/openspec/changes/archive/2026-09-30-add-realtime-chat-room/specs/agent-loop/spec.md
+?? submissions/kostyasabada/openspec/changes/archive/2026-09-30-add-realtime-chat-room/specs/chat-room/spec.md
+?? submissions/kostyasabada/openspec/changes/archive/2026-09-30-add-realtime-chat-room/specs/session-context-hook/spec.md
+?? submissions/kostyasabada/openspec/changes/archive/2026-09-30-add-realtime-chat-room/tasks.md
+--- diff --stat -M HEAD:
+ .../archive-add-realtime-chat-room/checks.txt      |  82 +++++
+ .../changes/add-realtime-chat-room/.openspec.yaml  |   2 -
+ .../changes/add-realtime-chat-room/design.md       | 334 ---------------------
+ .../changes/add-realtime-chat-room/proposal.md     |  53 ----
+ .../specs/agent-loop/spec.md                       |  97 ------
+ .../add-realtime-chat-room/specs/chat-room/spec.md | 251 ----------------
+ .../specs/session-context-hook/spec.md             |  36 ---
+ .../changes/add-realtime-chat-room/tasks.md        |  44 ---
+ 8 files changed, 82 insertions(+), 817 deletions(-)
+--- index:
+nothing staged
+openspec/changes:
+archive
+
+openspec/changes/archive:
+.gitkeep
+2026-09-30-add-realtime-chat-room
+[exit code: 0]
+
+=== STEP 2 after: moved content identical — ls-tree of old path at HEAD vs files at new path (git blob hash + SHA-256 of each)
+$ old=openspec/changes/add-realtime-chat-room; new=openspec/changes/archive/2026-09-30-add-realtime-chat-room; git ls-tree -r HEAD -- $old | awk -v o="$old/" "{sub(o,\"\",\$4); print \$3, \$4}" | sort -k2 > /tmp/claude-1000/-home-ksabada-projects-AI-course-2026-agentic-engineering-crash-course-capstone/4034e690-c8bb-4005-a19e-8b3d5038ed0e/scratchpad/old.txt; (cd $new && find . -type f | sed "s|^\./||" | sort | while read f; do echo "$(git hash-object "$f") $f"; done) > /tmp/claude-1000/-home-ksabada-projects-AI-course-2026-agentic-engineering-crash-course-capstone/4034e690-c8bb-4005-a19e-8b3d5038ed0e/scratchpad/new.txt; echo "HEAD:$old"; cat /tmp/claude-1000/-home-ksabada-projects-AI-course-2026-agentic-engineering-crash-course-capstone/4034e690-c8bb-4005-a19e-8b3d5038ed0e/scratchpad/old.txt; echo "working $new"; cat /tmp/claude-1000/-home-ksabada-projects-AI-course-2026-agentic-engineering-crash-course-capstone/4034e690-c8bb-4005-a19e-8b3d5038ed0e/scratchpad/new.txt; diff /tmp/claude-1000/-home-ksabada-projects-AI-course-2026-agentic-engineering-crash-course-capstone/4034e690-c8bb-4005-a19e-8b3d5038ed0e/scratchpad/old.txt /tmp/claude-1000/-home-ksabada-projects-AI-course-2026-agentic-engineering-crash-course-capstone/4034e690-c8bb-4005-a19e-8b3d5038ed0e/scratchpad/new.txt && echo "blob list identical: $(wc -l < /tmp/claude-1000/-home-ksabada-projects-AI-course-2026-agentic-engineering-crash-course-capstone/4034e690-c8bb-4005-a19e-8b3d5038ed0e/scratchpad/new.txt) files, 100% renames"; rc=$?; rm -f /tmp/claude-1000/-home-ksabada-projects-AI-course-2026-agentic-engineering-crash-course-capstone/4034e690-c8bb-4005-a19e-8b3d5038ed0e/scratchpad/old.txt /tmp/claude-1000/-home-ksabada-projects-AI-course-2026-agentic-engineering-crash-course-capstone/4034e690-c8bb-4005-a19e-8b3d5038ed0e/scratchpad/new.txt; echo "--- per-file byte compare via git show:"; for f in $(cd $new && find . -type f | sed "s|^\./||" | sort); do cmp <(git show HEAD:submissions/kostyasabada/$old/$f) $new/$f && echo "identical: $f"; done; echo "--- SHA-256 at new path:"; sha256sum $(find $new -type f | sort); test -e $old && echo "old path still exists" || echo "old path removed"; exit $rc
+HEAD:openspec/changes/add-realtime-chat-room
+2954835181aa8828ee99b59678930a8ddef3c2b3 design.md
+0ca5fbe8effc26d383d25fd5c1b08013554559d4 .openspec.yaml
+4423538729bccfcf8b5ee17804267e0a1c1e5372 proposal.md
+91ff48fbe923e50b22b933d9473e2e262166a30e specs/agent-loop/spec.md
+097d1cbdb7ae17f2184804ecb01bbb8dc7bcace5 specs/chat-room/spec.md
+074818356578677023cc9cf1048350ed2b6560e0 specs/session-context-hook/spec.md
+8b5b1c3f58236bef0006dab8bac8fd8a7d091846 tasks.md
+working openspec/changes/archive/2026-09-30-add-realtime-chat-room
+2954835181aa8828ee99b59678930a8ddef3c2b3 design.md
+0ca5fbe8effc26d383d25fd5c1b08013554559d4 .openspec.yaml
+4423538729bccfcf8b5ee17804267e0a1c1e5372 proposal.md
+91ff48fbe923e50b22b933d9473e2e262166a30e specs/agent-loop/spec.md
+097d1cbdb7ae17f2184804ecb01bbb8dc7bcace5 specs/chat-room/spec.md
+074818356578677023cc9cf1048350ed2b6560e0 specs/session-context-hook/spec.md
+8b5b1c3f58236bef0006dab8bac8fd8a7d091846 tasks.md
+blob list identical: 7 files, 100% renames
+--- per-file byte compare via git show:
+identical: design.md
+identical: .openspec.yaml
+identical: proposal.md
+identical: specs/agent-loop/spec.md
+identical: specs/chat-room/spec.md
+identical: specs/session-context-hook/spec.md
+identical: tasks.md
+--- SHA-256 at new path:
+9d36081ba9f342b5b2b950685f3d5c8ba74104873f0d07a4978df111d73ea383  openspec/changes/archive/2026-09-30-add-realtime-chat-room/design.md
+062e545e250441aa0692c22d7a65e07334f1c0f2e706c0e297f36065b6a0699c  openspec/changes/archive/2026-09-30-add-realtime-chat-room/.openspec.yaml
+cd7c996a994584dcb2772c64a64ea5455a486ac6f540c5226c56c2bc60340407  openspec/changes/archive/2026-09-30-add-realtime-chat-room/proposal.md
+515e2f7122df733a937001aa7348399c003e49b0177e7a6ba22291e7e77753e0  openspec/changes/archive/2026-09-30-add-realtime-chat-room/specs/agent-loop/spec.md
+7668da6246ac4f36cbdc745e88ae3a807b9c4f1f3940bdea9e6a7451e6bdf7dc  openspec/changes/archive/2026-09-30-add-realtime-chat-room/specs/chat-room/spec.md
+3ea516d91d00d3535878d78927821f3e001b0b35253f1dcbf8ef98792e4c72b3  openspec/changes/archive/2026-09-30-add-realtime-chat-room/specs/session-context-hook/spec.md
+acf6a7952218150a997b624b6c35ce0459da3e6ad6c5fa2528bc22ba828c2c93  openspec/changes/archive/2026-09-30-add-realtime-chat-room/tasks.md
+old path removed
+[exit code: 0]
+
+=== STEP 2 note: git diff --stat -M HEAD lists only deletions because the new files are untracked (git add -N not allowed), so git cannot pair them as renames; identity is shown by the blob-hash comparison above
+$ true
+[exit code: 0]
+
+=== STEP 2 after: validate all (strict)
+$ OPENSPEC_TELEMETRY=0 npm run --silent openspec -- validate --all --strict
+- Validating...
+✓ spec/agent-loop
+  ℹ [INFO] requirements[0]: Requirement text is very long (>500 characters). Consider breaking it down.
+  ℹ [INFO] requirements[2]: Requirement text is very long (>500 characters). Consider breaking it down.
+  ℹ [INFO] requirements[3]: Requirement text is very long (>500 characters). Consider breaking it down.
+  ℹ [INFO] requirements[4]: Requirement text is very long (>500 characters). Consider breaking it down.
+✓ spec/chat-room
+  ℹ [INFO] requirements[1]: Requirement text is very long (>500 characters). Consider breaking it down.
+  ℹ [INFO] requirements[3]: Requirement text is very long (>500 characters). Consider breaking it down.
+  ℹ [INFO] requirements[5]: Requirement text is very long (>500 characters). Consider breaking it down.
+  ℹ [INFO] requirements[7]: Requirement text is very long (>500 characters). Consider breaking it down.
+  ℹ [INFO] requirements[8]: Requirement text is very long (>500 characters). Consider breaking it down.
+✓ spec/session-context-hook
+Totals: 3 passed, 0 failed (3 items)
+[exit code: 0]
+
+=== STEP 2 after: active changes
+$ OPENSPEC_TELEMETRY=0 npm run --silent openspec -- list --json
+{
+  "changes": [],
+  "root": {
+    "path": "/home/ksabada/projects/AI_course/2026-agentic-engineering-crash-course-capstone/submissions/kostyasabada",
+    "source": "nearest"
+  }
+}
+[exit code: 0]
+
+=== STEP 2 after: specs
+$ OPENSPEC_TELEMETRY=0 npm run --silent openspec -- list --specs
+Specs:
+  agent-loop               requirements 6
+  chat-room                requirements 9
+  session-context-hook     requirements 3
+[exit code: 0]
+
+=== STEP 2 whitespace: tracked changes (git diff --check HEAD) and each untracked file (pass = no output and rc 1, calibrated in step 1)
+$ git diff --check HEAD; echo "tracked rc=$?"; rc=0; for f in $(git ls-files --others --exclude-standard); do o=$(git diff --no-index --check /dev/null "$f"); r=$?; printf "%s\n" "$o" | grep -v "^$"; echo "$f rc=$r"; { [ $r -eq 1 ] && [ -z "$o" ]; } || rc=1; done; exit $rc
+tracked rc=0
+openspec/changes/archive/2026-09-30-add-realtime-chat-room/.openspec.yaml rc=1
+openspec/changes/archive/2026-09-30-add-realtime-chat-room/design.md rc=1
+openspec/changes/archive/2026-09-30-add-realtime-chat-room/proposal.md rc=1
+openspec/changes/archive/2026-09-30-add-realtime-chat-room/specs/agent-loop/spec.md rc=1
+openspec/changes/archive/2026-09-30-add-realtime-chat-room/specs/chat-room/spec.md rc=1
+openspec/changes/archive/2026-09-30-add-realtime-chat-room/specs/session-context-hook/spec.md rc=1
+openspec/changes/archive/2026-09-30-add-realtime-chat-room/tasks.md rc=1
+[exit code: 0]
+
+=== STEP 2 final state before snapshot
+$ git status --short --untracked-files=all; git diff --cached --quiet && echo "nothing staged"; git -C .. status --short -- . ":!kostyasabada" | head; echo "(no entries above = nothing outside submissions/kostyasabada changed)"
+ M docs/evidence/archive-add-realtime-chat-room/checks.txt
+ M docs/evidence/archive-add-realtime-chat-room/implementation.md
+ D openspec/changes/add-realtime-chat-room/.openspec.yaml
+ D openspec/changes/add-realtime-chat-room/design.md
+ D openspec/changes/add-realtime-chat-room/proposal.md
+ D openspec/changes/add-realtime-chat-room/specs/agent-loop/spec.md
+ D openspec/changes/add-realtime-chat-room/specs/chat-room/spec.md
+ D openspec/changes/add-realtime-chat-room/specs/session-context-hook/spec.md
+ D openspec/changes/add-realtime-chat-room/tasks.md
+?? openspec/changes/archive/2026-09-30-add-realtime-chat-room/.openspec.yaml
+?? openspec/changes/archive/2026-09-30-add-realtime-chat-room/design.md
+?? openspec/changes/archive/2026-09-30-add-realtime-chat-room/proposal.md
+?? openspec/changes/archive/2026-09-30-add-realtime-chat-room/specs/agent-loop/spec.md
+?? openspec/changes/archive/2026-09-30-add-realtime-chat-room/specs/chat-room/spec.md
+?? openspec/changes/archive/2026-09-30-add-realtime-chat-room/specs/session-context-hook/spec.md
+?? openspec/changes/archive/2026-09-30-add-realtime-chat-room/tasks.md
+nothing staged
+(no entries above = nothing outside submissions/kostyasabada changed)
+[exit code: 0]

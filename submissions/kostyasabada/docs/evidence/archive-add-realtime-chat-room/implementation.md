@@ -62,3 +62,44 @@ Two further disposable copies held the base `openspec/` tree plus the synced mai
 - Helper scripts live in the session scratchpad (outside the repository) and are not part of the deliverables; their full bodies are in `checks.txt`. The scratchpad also contains unrelated files from earlier sessions, which were not touched.
 - No application tests were run: this step changes specifications only.
 - No review has been performed yet; independent checker acceptance is pending.
+
+## Step 2: move the change
+
+The sections above describe step 1 as reviewed. The checker accepted it (`review.md`), and it was committed as `a0d8abd`. The step-1 `snapshot.txt` is preserved in that commit; the current `snapshot.txt` is the step-2 snapshot.
+
+- Instruction: user, 2026-09-30, "commit and run step 2", relayed by the coordinator. Maker: the same Claude Code general-purpose subagent (maker). Base: `a0d8abd` (`a0d8abdb5a28090d964fbc1a2b46de7648f9a83f`). Node `v24.21.0`.
+- Criteria:
+  - Run the checker's recommended default command with no `--skip-specs` and no `--no-validate`.
+  - Stop without fixing if the output is anything other than zero totals with "Specs already in sync; no files changed.", or if the exit code is non-zero.
+  - Afterwards: main specs unchanged; the moved files identical to the originals; strict validation passes; no active changes; spec counts 6/9/3.
+  - Do not edit documents that reference the old path, and do not stage or commit.
+
+### Preconditions (all recorded in `checks.txt`, STEP 2 part)
+
+- HEAD is `a0d8abd`.
+- `sha256sum -c` on the three main-spec lines of the committed step-1 `snapshot.txt`: all OK.
+- `git diff --exit-code HEAD -- openspec/changes`: no diff.
+- `git status --short` was not empty. The only entry was `checks.txt`, modified by this step's own STEP 2 appends: the HEAD version is an exact byte prefix of the working file, and nothing else was modified or untracked. The precondition entry therefore shows exit 1, followed by the append-only proof with exit 0. I treated this as satisfied in substance: it is not the archive stop condition.
+
+### Command and output
+
+`OPENSPEC_TELEMETRY=0 npm run --silent openspec -- archive add-realtime-chat-room --yes` exited 0. It printed the non-blocking proposal warning, then `Task status: ✓ Complete`, all three specs listed as `update`, `Totals: + 0, ~ 0, - 0, → 0`, `Specs already in sync; no files changed.`, and `Change 'add-realtime-chat-room' archived as '2026-09-30-add-realtime-chat-room'.` The stop condition was not triggered.
+
+### Verification after the move
+
+- Moved from `submissions/kostyasabada/openspec/changes/add-realtime-chat-room/` to `submissions/kostyasabada/openspec/changes/archive/2026-09-30-add-realtime-chat-room/`. The old path no longer exists, and `openspec/changes/` now contains only `archive/` (`.gitkeep` plus the archived change).
+- Main specs: the SHA-256 values match the step-1 snapshot, and `git diff --exit-code HEAD -- openspec/specs` shows no diff.
+- Content identity:
+  - The `git ls-tree -r HEAD` blob hashes of the 7 files at the old path equal `git hash-object` of the 7 files at the new path.
+  - Each file is byte-identical to `git show HEAD:<old path>/<file>` (`cmp`).
+  - Together these show the move is 7 pure renames.
+- `git status --short` / `--porcelain`: 7 `D` entries at the old path, 7 `??` entries at the new path, and ` M checks.txt`. Nothing is staged.
+  - `git diff --stat -M HEAD` lists only the deletions, because the new files are untracked (`git add -N` was not allowed) and git cannot pair them as renames. The blob-hash comparison above stands in for that.
+- `openspec validate --all --strict`: 3 passed, 0 failed, exit 0 (INFO notes only; no change items remain).
+- `openspec list --json`: `"changes": []`. `openspec list --specs`: agent-loop 6, chat-room 9, session-context-hook 3.
+- Whitespace: see the final entries in `checks.txt`. The check method is the one calibrated in step 1.
+
+### Step 2 limitations and follow-up
+
+- Tracked documents that still reference the old active-change path were deliberately not edited: the checker's finding 1 lists `README.md`, `docs/architecture.md`, `docs/testing.md`, `docs/workflow.md`, and `scripts/agent-loop.sh`. That is a separate follow-up task.
+- Checker review of step 2 is pending.

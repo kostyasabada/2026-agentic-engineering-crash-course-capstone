@@ -141,3 +141,50 @@ Preconditions:
 ## Verdict
 
 accepted — the three main specs in the snapshot are byte-identical to what `openspec archive` 1.13.2 generates from the change, contain every delta requirement and scenario verbatim and in order with the Purpose copied and no delta headers, validate strictly, and leave the change untouched. Finding 1 is a follow-up for after step 2, not a blocker for this step.
+
+## Round 2 — step 2 (move)
+
+- Checker: Claude Code general-purpose subagent (checker), separate from coordinator and maker; same checker as round 1.
+- Date: 2026-09-30. Versions as in round 1 (Node `v24.21.0`, OpenSpec CLI `1.13.2`, git `2.53.0`).
+- Instruction: user, 2026-09-30, "commit and run step 2", relayed by the coordinator. Step 1 (with the round-1 review) was committed as `a0d8abd` with the user's approval.
+- Read: `snapshot.txt` ("step 2: move"), the "Step 2: move the change" section of `implementation.md` (from line 66), and the STEP 2 part of `checks.txt` (from line 913).
+
+### Reviewed snapshot
+
+`snapshot.txt` (label "step 2: move", base `a0d8abd` / `a0d8abdb5a28090d964fbc1a2b46de7648f9a83f`): SHA-256 of the 7 moved files at the new path, the 3 main specs, `implementation.md` (`9c2f4ed41a21ba38e7f287d133629014cc1978973e9dc9f9f03a6af3b9201bb1`), and `checks.txt` (`9d36b382981aa56e97cd00e8e863b5ae8b610f1a5c80298efb81206d1ade57aa`). All 12 hash lines verified with `sha256sum -c` from the repository root: OK. The recomputed `checks.txt` hash equals the expected `9d36b382…ade57aa`. This round appends to `review.md`, which was committed in `a0d8abd` and is not part of the step-2 snapshot.
+
+### Findings
+
+No blocking or medium findings against step 2.
+
+1. Info, precondition deviation (does not affect the result): the recorded precondition "tree clean" failed (`checks.txt`, STEP 2 precondition entry, exit 1) because the only change was the maker's own appends to `checks.txt`. The next entry shows the `a0d8abd` version as an exact byte prefix of the working file and no other changes; `implementation.md` discloses it in "Preconditions". The substantive preconditions held: main-spec hashes matched the step-1 snapshot and `openspec/changes` had no diff. `openspec archive` reads and writes only under `openspec/`, the stop condition was not triggered, and the result (7 pure renames, specs unchanged) is independent of an evidence log file. The round-1 wording ("`git status --short` ... clean") was stricter than needed; the relevant conditions are the spec hashes and an unchanged `openspec/changes`.
+2. Info, evidence (no change needed): the step-1 limitation line `implementation.md:64` ("No review has been performed yet; independent checker acceptance is pending.") remains because the file is append-only; the step-2 section (`implementation.md:68`) states that step 1 was accepted and committed. The maker's step-2 log runs `validate --all --strict` but not a separate `validate --specs --strict`; the checker ran both (below).
+3. Low, follow-up still open (restated from round 1, finding 1): tracked references to the old active-change path are now stale because the path no longer exists. Scope of the separate, reviewed docs task:
+   - `README.md:7` (`openspec/changes/add-realtime-chat-room/`)
+   - `docs/architecture.md:19` and `:20` (`.../design.md`), `docs/architecture.md:24` (`.../specs/`; the same line also says task 6.1 is the final verification, which may need updating now that the change is archived)
+   - `docs/testing.md:3` (`.../specs/`)
+   - `docs/workflow.md:48` (`.../specs/`, plus the sentence that `openspec/specs/` and the archive "stay empty until" the first change is archived, now false), `docs/workflow.md:62` (`.../specs/agent-loop/spec.md`), `docs/workflow.md:66` (`.../specs/session-context-hook/spec.md`)
+   - `scripts/agent-loop.sh:4` (comment, `.../specs/agent-loop/spec.md`)
+
+   Likely targets: the main specs `openspec/specs/<capability>/spec.md` for requirements, and `openspec/changes/archive/2026-09-30-add-realtime-chat-room/design.md` for design references. Historical evidence under `docs/evidence/` should stay as it is. No references were found in `src/`, `tests/`, `.claude/`, or `CLAUDE.md`.
+
+### Independent checks (real repository, read-only)
+
+1. `git rev-parse HEAD`: `a0d8abdb5a28090d964fbc1a2b46de7648f9a83f`. Nothing staged (`git diff --cached --quiet` exit 0, before and after the checks).
+2. `openspec/changes/add-realtime-chat-room/` does not exist; `openspec/changes/` contains only `archive/` (`.gitkeep` and `2026-09-30-add-realtime-chat-room/`). The new directory has 7 files; `git ls-tree -r a0d8abd` has 7 files at the old path, all mode `100644`; no file at the new path is executable. For each of the 7 files, `cmp` with `git show a0d8abd:<old path>` is identical and `git hash-object` equals the `ls-tree` blob hash.
+3. Rename proof without touching the real index: a temporary copy of the index (`GIT_INDEX_FILE` in the scratchpad), `git add -A openspec/changes`, then `git diff --cached -M --summary a0d8abd -- openspec`: exactly 7 `rename ... (100%)` entries into `archive/2026-09-30-add-realtime-chat-room/`. The temporary index was deleted; the real index stayed clean.
+4. `git diff --exit-code a0d8abd -- openspec/specs`: exit 0; the main-spec hashes match both snapshots.
+5. `openspec validate --all --strict`: 3 passed, 0 failed, exit 0 (no change items remain). `openspec validate --specs --strict`: 3 passed, 0 failed, exit 0. Only `[INFO]` notes about long requirement text. `openspec list --json`: `"changes": []`, exit 0; `openspec list`: "No active changes found."; `openspec list --specs`: agent-loop 6, chat-room 9, session-context-hook 3.
+6. `git status --short --untracked-files=all` (before this review was appended): ` M` for `checks.txt`, `implementation.md`, `snapshot.txt`; 7 ` D` at the old path; 7 `??` at the new path; nothing else. The course repository status has no entries outside `submissions/kostyasabada/`.
+7. Append-only: the `a0d8abd` versions of `checks.txt` (56524 bytes) and `implementation.md` (7256 bytes) are exact byte prefixes of the working files (`cmp -n`). `snapshot.txt` was replaced by the step-2 snapshot; the step-1 snapshot is preserved in `a0d8abd`, as `implementation.md` states.
+8. Whitespace: `git diff --check` and `git diff --check HEAD`: exit 0. `git diff --no-index --check /dev/null <file>` for the 7 untracked files and for `checks.txt`, `implementation.md`, `snapshot.txt`: exit 1 with no output each (calibration as in round 1).
+9. Evidence consistency: the logged command is the round-1 recommendation (`OPENSPEC_TELEMETRY=0 npm run --silent openspec -- archive add-realtime-chat-room --yes`, no `--skip-specs`, no `--no-validate`), exit 0, output `Totals: + 0, ~ 0, - 0, → 0`, "Specs already in sync; no files changed.", archived as `2026-09-30-add-realtime-chat-room`; this matches the round-1 rehearsal in disposable copies. The logged hashes and blob lists match what the checker measured.
+
+### Limitations
+
+- The archive command itself was not re-run by the checker (it would require undoing the move in the real repository); its output is taken from `checks.txt` and corroborated by the resulting state and the round-1 rehearsals.
+- `checks.txt` entries after the snapshot hash was taken cannot exist without changing that hash; its current hash matches, so the log is as snapshotted.
+
+### Verdict
+
+accepted — the change was moved by the CLI as 7 byte-identical renames into `openspec/changes/archive/2026-09-30-add-realtime-chat-room/`, the main specs are unchanged from `a0d8abd`, strict validation passes, and there are no active changes. The precondition deviation is disclosed and does not affect the result. The stale-reference docs update (finding 3) remains a separate follow-up task.
