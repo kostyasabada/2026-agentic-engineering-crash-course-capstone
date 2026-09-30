@@ -153,7 +153,7 @@ The server SHALL assign each accepted message a unique, increasing identifier an
 - **THEN** its displayed time is `14:05`
 
 ### Requirement: Recent history for a joining client
-When a client connects to the room, the system SHALL send it the latest 100 accepted messages (or all messages if there are fewer), ordered oldest to newest, before or together with any new live messages. Older messages SHALL NOT be shown. The conversation SHALL be scrolled to the newest message after the history loads, and SHALL scroll to a newly arrived message when the person is already viewing the newest message.
+When a client connects to the room, the system SHALL send it the latest 100 accepted messages (or all messages if there are fewer), ordered oldest to newest, before or together with any new live messages. Older messages SHALL NOT be shown. The conversation SHALL be scrolled to the newest message after the history loads, and SHALL scroll to a newly arrived message when the person is already viewing the newest message. When the server has accepted a message the person sent, the conversation SHALL scroll to the newest message even if the person had scrolled up; a message that was not accepted SHALL NOT move the view.
 
 #### Scenario: New client receives the latest 100 messages in order
 - **WHEN** 105 messages numbered 1 to 105 have been accepted and a new client opens the room
@@ -167,6 +167,10 @@ When a client connects to the room, the system SHALL send it the latest 100 acce
 #### Scenario: Reading older messages is not interrupted
 - **WHEN** a person has scrolled up to read older messages and another client sends a new message
 - **THEN** the scroll position stays where the person left it
+
+#### Scenario: Own message scrolls into view
+- **WHEN** a person has scrolled up to read older messages and sends a message, and the server accepts it
+- **THEN** the conversation scrolls to the newest message so that the person's own message is visible at the bottom
 
 #### Scenario: New client receives fewer than 100 messages
 - **WHEN** 3 messages have been accepted and a new client opens the room
