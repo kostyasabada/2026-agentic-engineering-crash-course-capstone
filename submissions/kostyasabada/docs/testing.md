@@ -1,6 +1,6 @@
 # Verification
 
-Automated checks are committed in the project and run with npm scripts from `submissions/kostyasabada/`. Expected behavior is defined in OpenSpec (`openspec/changes/add-realtime-chat-room/specs/`); this file lists how to verify it.
+Automated checks are committed in the project and run with npm scripts from `submissions/kostyasabada/`. Expected behavior is defined in OpenSpec (`openspec/specs/`); this file lists how to verify it.
 
 ## Prerequisite
 

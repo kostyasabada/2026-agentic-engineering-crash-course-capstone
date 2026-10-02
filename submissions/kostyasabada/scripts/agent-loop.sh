@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # Agent loop: runs the project's checks and hands failures to a fresh, non-interactive
 # fixer agent until the checks pass or a stop condition is reached.
-# Normative behavior: openspec/changes/add-realtime-chat-room/specs/agent-loop/spec.md;
-# interface, invocation, log format, and fingerprint: design.md D7.
+# Normative behavior: openspec/specs/agent-loop/spec.md;
+# interface, invocation, log format, and fingerprint: D7 in
+# openspec/changes/archive/2026-09-30-add-realtime-chat-room/design.md.
 #
 # The loop never commits, pushes, edits tasks.md, or writes review files, and a green
 # loop is not acceptance: a separate checker still reviews the task.

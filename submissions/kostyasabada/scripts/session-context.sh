@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Claude Code SessionStart hook (design D8, specs/session-context-hook/spec.md).
+# Claude Code SessionStart hook. Normative behavior: openspec/specs/session-context-hook/spec.md;
+# design: D8 in openspec/changes/archive/2026-09-30-add-realtime-chat-room/design.md.
 # Prints the active OpenSpec changes for the session context. Plain-text stdout of a
 # SessionStart hook that exits 0 is added to the session context by Claude Code.
 # Read-only: writes no files, installs nothing, and always exits 0 so the session is never

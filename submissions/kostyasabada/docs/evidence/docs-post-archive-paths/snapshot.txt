@@ -1,0 +1,17 @@
+Snapshot: docs-post-archive-paths, revision 2 (round 2)
+Base commit: a55b664 (a55b6646372ccffad0b91ed38b665ef5fe76b158). Working-tree changes on top of it: the six modified files below (unstaged) and this evidence directory (untracked). Nothing staged.
+Maker: Claude Code general-purpose subagent (maker). Paths are relative to the repository root.
+The checks.txt hash is final: it was taken after the last append. The final whitespace recheck of implementation.md, checks.txt, and this file is not logged in checks.txt.
+review.md (round 1, written by the checker) is unchanged and not part of this snapshot.
+
+SHA-256: changed deliverables
+6e6ef53d5e90bc48c9c0808b8f63c3dcd8a72477ce02b93cf955e632255e84ce  submissions/kostyasabada/README.md
+54bf97194382a65a08e378c3ef17784a161765210272763eaaedf0d56023563a  submissions/kostyasabada/docs/architecture.md
+cc34607f4358cd69e132a6a1acf6c941077e0498f85367555a35412978aa68fe  submissions/kostyasabada/docs/testing.md
+9c602a6d534a92104871d940b10035ebb5c5c5c22ee9929c60167c892677a06d  submissions/kostyasabada/docs/workflow.md
+d95b71fd48d4d0f450515e621e9cdd4cafb80d45dd7d7f24afbcdd800cd7ef28  submissions/kostyasabada/scripts/agent-loop.sh
+2878f76d1e2d43950fc19b22adda5ee7f5f285c6100f6c367e2c58d83582d565  submissions/kostyasabada/scripts/session-context.sh
+
+SHA-256: evidence
+7641ef83be13a59c3f21cf2037bd7612892cc4d2802ebfbf6d5cba19a1acc319  submissions/kostyasabada/docs/evidence/docs-post-archive-paths/implementation.md
+99b66caad16046d004d17b547f3de2e2297860484bce73282b4a255be7c0b4f1  submissions/kostyasabada/docs/evidence/docs-post-archive-paths/checks.txt

@@ -4,7 +4,7 @@ A small educational capstone chat application built using Agentic Engineering pr
 
 ## Current status
 
-The first OpenSpec change, `add-realtime-chat-room`, is implemented: one chat room where people join with a nickname (no registration), exchange messages in real time over Socket.IO, and see the latest 100 messages from SQLite storage, with connection status and catch-up after reconnection. It also adds the tooling: lint, type check, unit and E2E test commands, the agent loop script, and the Claude Code `SessionStart` hook. The final verification from a clean checkout is task 6.1. Requirements and tasks live in `openspec/changes/add-realtime-chat-room/`; `npm run --silent openspec -- list --json` shows progress. Known limitations and deferred follow-ups are in `docs/architecture.md`.
+The first OpenSpec change, `add-realtime-chat-room`, is complete and archived: one chat room where people join with a nickname (no registration), exchange messages in real time over Socket.IO, and see the latest 100 messages from SQLite storage, with connection status and catch-up after reconnection. It also adds the tooling: lint, type check, unit and E2E test commands, the agent loop script, and the Claude Code `SessionStart` hook. Its final verification from a clean checkout was task 6.1. Its requirements now live in `openspec/specs/` (`agent-loop`, `chat-room`, `session-context-hook`); its proposal, design, and tasks are archived in `openspec/changes/archive/2026-09-30-add-realtime-chat-room/`; `npm run --silent openspec -- list --json` shows active changes (none at present). Known limitations and deferred follow-ups are in `docs/architecture.md`.
 
 ## Documentation
 
